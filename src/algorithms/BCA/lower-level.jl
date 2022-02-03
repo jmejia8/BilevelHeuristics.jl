@@ -1,0 +1,81 @@
+function lower_level_optimizer(
+        status, # an initialized State (if apply)
+        parameters::BCA,
+        problem,
+        information,
+        options,
+        x,
+        args...;
+        kargs...
+    )
+
+
+    ff(y) = Metaheuristics.evaluate(x, y, problem.ll)
+
+    D = size(problem.ll.bounds, 2)
+
+    N = parameters.n
+    K = parameters.K
+    η_max = parameters.η_max
+    opts_ll = options.ll
+    info_ll = information.ll
+
+    method = Metaheuristics.ECA(;N, η_max, K,
+                                p_bin=0.0,
+                                p_exploit=2.0,
+                                resize_population = parameters.resize_population,
+                                options = opts_ll,
+                                information = info_ll)
+    res = Metaheuristics.optimize( ff, problem.ll.bounds, method)
+
+    fmin = Metaheuristics.minimum(res)
+
+    fs = Metaheuristics.fvals(res.population)
+    mask = findall( v -> abs(v - fmin) < 1e-12, fs)
+
+    if isnothing(mask) || length(mask) == 1
+        return [res.best_sol]
+    end
+
+
+    ############# updated to handle multi-modal problems at lower level #################
+    ll_sols = [res.best_sol]
+
+    # for normalization
+    Diag = norm( problem.ll.bounds[1,:] - problem.ll.bounds[2,:] )
+
+    # min distance between solution with same fitness
+    d_tol = 0.01Diag
+
+    # save all solutions far from the best solutions wit same fitness
+    candidate_ll_sols = res.population[mask]
+
+    for candidate in candidate_ll_sols
+        save_sol = true
+
+        for sol in ll_sols
+            @fastmath distance_to_best = norm( sol.x - candidate.x )
+            if distance_to_best < d_tol
+                save_sol = false
+                break
+            end
+        end
+        save_sol && push!(ll_sols, candidate)
+    end
+
+    
+    n = length(ll_sols)
+    options.ul.debug && n > 1 && @info "Lower level seems multimodal ($n optimums)."
+
+    if n > 10
+        display(Metaheuristics.positions(ll_sols))
+        display(Metaheuristics.fvals(ll_sols))
+        error("asdf")
+        
+    end
+    
+     
+    return ll_sols
+
+end
+
