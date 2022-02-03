@@ -90,14 +90,15 @@ function initialize!(
 
     X = a .+ (b - a) .* rand(N, D)
 
-    population = []
+    population_ = []
     for i in 1:parameters.N
         x = X[i,:]
         ll_sols = lower_level_optimizer(status, parameters, problem, information, options, x)
         for ll_sol in ll_sols
-            push!(population, create_solution(x, ll_sol, problem))
+            push!(population_, create_solution(x, ll_sol, problem))
         end
     end
+    population = [s for s in population_]
 
     
     truncate_population!(status, parameters, problem, information, options, is_better_bca)
@@ -136,13 +137,6 @@ function update_state!(
     a = problem.ul.bounds[1,:]
     b = problem.ul.bounds[2,:]
     D = length(a)
-
-    X = zeros(parameters.N, D)
-
-    for i in 1:parameters.N
-        X[i,:] = leader_pos(status.population[i])
-    end
-
 
     I = randperm(parameters.N)
     

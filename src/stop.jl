@@ -9,7 +9,7 @@ end
 
 
 function iteration_stop_check(status, information, options)
-    cond = status.iteration > options.ul.iterations
+    cond = status.iteration >= options.ul.iterations
 
     if cond
         status.stop_msg *= "Stopped due completed iterations. "

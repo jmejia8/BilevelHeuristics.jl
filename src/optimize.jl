@@ -32,6 +32,7 @@ function Metaheuristics.optimize(
     method.status = status
     status.F_calls = problem.ul.f_calls
     status.f_calls = problem.ll.f_calls
+    status.start_time = start_time
     status.final_time = time()
 
     if options.ul.debug
@@ -43,7 +44,6 @@ function Metaheuristics.optimize(
     status.iteration = 1
 
 
-    status.start_time = start_time
     convergence = BLState{typeof(status.best_sol)}[]
 
 

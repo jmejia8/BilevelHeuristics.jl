@@ -85,7 +85,7 @@ function initialize!(
 
     X = a .+ (b - a) .* rand(N, D)
 
-    population = []
+    population_ = []
 
     # only for initializaton
     bca = BCA(N, 3*D, 3, parameters.η_ul_max, resize_population)
@@ -95,9 +95,11 @@ function initialize!(
         ll_sols = lower_level_optimizer(status, bca, problem, information, options, x)
         for ll_sol in ll_sols
             ll_sol_improved = BFGS_LL(x, ll_sol.x, parameters, problem, information, options)
-            push!(population, create_solution(x, ll_sol_improved, problem))
+            push!(population_, create_solution(x, ll_sol_improved, problem))
         end
     end
+
+    population = [s for s in population_]
 
     truncate_population!(status, parameters, problem, information, options, (a, b) -> is_better_qbca(a,b, parameters))
     
