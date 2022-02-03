@@ -1,30 +1,14 @@
 # BilevelHeuristics.jl
 
 
-This package implements different heuristics and metaheuristics algorithms for 
+This package implements different heuristic and metaheuristic algorithms for 
 bilevel optimization.
+
+**This package is under development (still an alpha version).**
 
 ## Algorithms
 
 The algorithms implemented are listed as follows:
-
-### BLEMO: Bilevel Evolutionary Multiobjective Optimization
-
-Use the following command to perform the experiments regarding BLEMO:
-
-Open a Julia console (REPL) in the project's main folder and run:
-
-```julia
-julia> include("scripts/test-blemo.jl")
-```
-
-**First execution can take some minutes since dependencies are installed.**
-
-Important files:
-- BLEMO source code is in `src/algorithms/BLEMO/BLEMO.jl`.
-- Experiments are in `scripts/test-blemo.jl`.
-
-More information about the project structure is detailed [here](https://juliadynamics.github.io/DrWatson.jl/stable/project/#Default-Project-Setup-1).
 
 ### BCA: Bilevel Centers Algorithms
 
