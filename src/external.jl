@@ -8,4 +8,4 @@ import Statistics: std, mean, var
 import Optim
 import LinearAlgebra: norm
 import LineSearches
-import BiApprox
+

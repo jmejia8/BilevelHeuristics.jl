@@ -8,11 +8,10 @@ include("core.jl")
 include("stop.jl")
 include("optimize.jl")
 include("TestProblems/TestProblems.jl")
+include("BiApprox/BiApprox.jl")
 
 
 # algorithms
-
-
 include("algorithms/BCA/BCA.jl")
 include("algorithms/QBCA/QBCA.jl")
 include("algorithms/QBCA2/QBCA2.jl")

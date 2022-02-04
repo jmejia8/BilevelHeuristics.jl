@@ -66,13 +66,6 @@ function lower_level_optimizer(
     
     n = length(ll_sols)
     options.ul.debug && n > 1 && @info "Lower level seems multimodal ($n optimums)."
-
-    if n > 10
-        display(Metaheuristics.positions(ll_sols))
-        display(Metaheuristics.fvals(ll_sols))
-        error("asdf")
-        
-    end
     
      
     return ll_sols
