@@ -1,4 +1,4 @@
-mutable struct BCA
+mutable struct BCA <: Metaheuristics.AbstractParameters
     N::Int
     n::Int
     K::Int
@@ -17,10 +17,11 @@ function BCA(;N = 0, n=0, K = 7, η_max=2.0, resize_population = true,
 
     parameters = BCA(N, n,  K, η_max, resize_population)
 
-    return Algorithm(parameters;
-                     options = BLOptions(options_ul, options_ll),
-                     information = BLInformation(information_ul, information_ll)
-                    )
+    Algorithm(
+        parameters;
+        options = BLOptions(options_ul, options_ll),
+        information = BLInformation(information_ul, information_ll)
+    )
 end
 
 
@@ -37,7 +38,6 @@ function truncate_population!(status, parameters, problem, information, options,
     if parameters.N == length(status.population)
         return
     end
-    
 
     N = parameters.N
     sort!(status.population, lt = is_better)
@@ -100,9 +100,9 @@ function initialize!(
     end
     population = [s for s in population_]
 
-    
+
     truncate_population!(status, parameters, problem, information, options, is_better_bca)
-    
+
     best = Metaheuristics.get_best(population)
     return BLState(best, population) # replace this
 end
@@ -139,7 +139,7 @@ function update_state!(
     D = length(a)
 
     I = randperm(parameters.N)
-    
+
     population = status.population
 
     p = status.F_calls / options.ul.f_calls_limit
@@ -171,13 +171,13 @@ function update_state!(
             end
         end
 
- 
+
     end
 
     parameters.N = round(Int, parameters.K*(D - (D-2)*p))
     truncate_population!(status, parameters, problem, information, options, is_better_bca)
-    
-    
+
+
 
 
 end

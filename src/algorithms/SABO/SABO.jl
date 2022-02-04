@@ -1,4 +1,4 @@
-mutable struct SABO
+mutable struct SABO <: Metaheuristics.AbstractParameters
     N::Int
     K::Int
     η_max::Float64

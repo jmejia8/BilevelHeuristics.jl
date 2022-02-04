@@ -1,4 +1,4 @@
-mutable struct QBCA
+mutable struct QBCA <: Metaheuristics.AbstractParameters
     N::Int
     K::Int
     η_ul_max::Float64
