@@ -8,6 +8,8 @@ mutable struct SABO
     ε2::Float64
     t_reevaluate::Int
     autodiff::Symbol # :finite or :forward
+    use_surrogate_model::Bool
+    λ::Float64
 end
 
 include("lower-level.jl")
@@ -19,6 +21,7 @@ function SABO(;N = 0,
         δ2 = 1e-2,
         ε1 = 1e-2,
         ε2 = 1e-2,
+        λ = 1e-5,
         t_reevaluate=10,
         autodiff = :finite,
         options_ul = Metaheuristics.Options(),
@@ -27,7 +30,7 @@ function SABO(;N = 0,
         information_ll = Metaheuristics.Information()
     )
 
-    parameters = SABO(N, K, η_max, δ1, δ2, ε1, ε2, t_reevaluate, autodiff)
+    parameters = SABO(N, K, η_max, δ1, δ2, ε1, ε2, t_reevaluate, autodiff, true,λ)
 
 
     return Algorithm(parameters;

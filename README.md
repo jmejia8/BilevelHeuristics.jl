@@ -6,6 +6,23 @@ bilevel optimization.
 
 **This package is under development (still an alpha version).**
 
+## Installation
+
+
+Open the Julia (Julia 1.2 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
+
+
+Type `]`  
+```julia
+pkg> add https://github.com/jmejia8/BilevelHeuristics.jl.git
+```
+
+Or, equivalently, via the `Pkg` API:
+
+```julia
+julia> import Pkg; Pkg.add("https://github.com/jmejia8/BilevelHeuristics.jl.git")
+```
+
 ## Algorithms
 
 The algorithms implemented are listed as follows:

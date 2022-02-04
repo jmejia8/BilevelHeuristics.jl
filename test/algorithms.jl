@@ -28,7 +28,7 @@ function test_BCA()
     information_ll = Information(f_optimum = 0.0)
     
     methods = [
-               # SABO(;options_ul, options_ll, information_ul, information_ll),
+               SABO( N = 14;options_ul, options_ll, information_ul, information_ll),
                QBCA2(N = 14;options_ul, options_ll, information_ul, information_ll),
                QBCA( N = 14;options_ul, options_ll, information_ul, information_ll),
                BCA(  N = 14;options_ul, options_ll, information_ul, information_ll),
@@ -43,6 +43,7 @@ function test_BCA()
         # @test isapprox(fxy, 0.0, atol=options_ll.f_tol)
         @test F_calls == r.F_calls
         @test f_calls == r.f_calls
+        @test !isnan(Fxy) && !isnan(fxy)
     end
 
 end

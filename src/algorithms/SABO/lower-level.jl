@@ -102,7 +102,7 @@ function lower_level_optimizer(
         C = status.population[I[1:D]] # the nearest to p
         sol = gen_optimal_sabo(p, problem, C)
     else
-        sol = gen_optimal(p, problem)
+        sol = gen_optimal(p, problem, parameters, options)
     end
 
 
