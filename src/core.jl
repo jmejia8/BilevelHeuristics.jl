@@ -114,6 +114,8 @@ function Algorithm(
 
 end
 
+Base.show(io::IO, blalgorithm::BLAlgorithm) = show(io, blalgorithm.parameters)
+
 
 
 function Metaheuristics.evaluate(x, y, problem)
