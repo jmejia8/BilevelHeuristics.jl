@@ -57,7 +57,7 @@ function use_surrogate!( status,
 
     Y = Metaheuristics.fvals(status.population)
     Y /= maximum(abs.(Y))
-    N = length(Y)
+    N = size(Y,1)
 
     D = length(a)
     X = zeros(N, D)
