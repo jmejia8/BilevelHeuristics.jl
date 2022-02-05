@@ -1,6 +1,6 @@
-mutable struct BLIndividual{T} <: Metaheuristics.AbstractSolution
-    ul::T
-    ll::Vector{T}
+mutable struct BLIndividual{U, L} <: Metaheuristics.AbstractSolution
+    ul::U
+    ll::L
 end
 
 mutable struct BLProblem <: Metaheuristics.AbstractProblem
@@ -34,7 +34,7 @@ end
 minimum(status::BLState) = (leader_f(status.best_sol), follower_f(status.best_sol))
 minimizer(status::BLState) = (leader_pos(status.best_sol), follower_pos(status.best_sol))
 
-get_ul_population(pop::Vector{BLIndividual{T}}) where T <: Metaheuristics.AbstractSolution = [sol.ul for sol in pop]
+get_ul_population(pop::Vector{BLIndividual{U, L}}) where U where L = [sol.ul for sol in pop]
 
 function Base.show(io::IO, status::BLState)
     println(io, "+=========== RESULT ==========+")
@@ -125,10 +125,10 @@ end
 
 
 function create_solution(x, sol_ll, problem)
-    y = sol_ll.x
+    y = Metaheuristics.get_position(sol_ll)
     sol_ul = Metaheuristics.create_child(x, problem.ul.f(x, y))
     problem.ul.f_calls += 1
-    return BLIndividual(sol_ul, [sol_ll])
+    return BLIndividual(sol_ul, sol_ll)
 end
 
 
@@ -141,11 +141,11 @@ function Metaheuristics.is_better(A::BLIndividual, B::BLIndividual)
 
 end
 
-leader_pos(A::BLIndividual) = A.ul.x
-follower_pos(A::BLIndividual) = A.ll[1].x
+leader_pos(A::BLIndividual)   = Metaheuristics.get_position(A.ul)
+follower_pos(A::BLIndividual) = Metaheuristics.get_position(A.ll)
 
-leader_f(A::BLIndividual) = A.ul.f
-follower_f(A::BLIndividual) = A.ll[1].f
+leader_f(A::BLIndividual)   = Metaheuristics.fval(A.ul)
+follower_f(A::BLIndividual) = Metaheuristics.fval(A.ll)
 
 
 
