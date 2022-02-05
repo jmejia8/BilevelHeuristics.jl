@@ -4,6 +4,8 @@
 This package implements different heuristic and metaheuristic algorithms for 
 bilevel optimization.
 
+[![Build Status](https://app.travis-ci.com/jmejia8/BilevelHeuristics.jl.svg?branch=main)](https://app.travis-ci.com/jmejia8/BilevelHeuristics.jl)
+
 **This package is under development (still an alpha version).**
 
 ## Installation
