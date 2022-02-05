@@ -158,9 +158,11 @@ function initialize!(
     end
 
     if options.ul.f_calls_limit == 0
-        options.ul.f_calls_limit = 1000*D
+        options.ul.f_calls_limit = 100*D
+        c = options.ul.f_calls_limit
+        options.ul.debug && @warn "SABO is limiting the number of function evaluations to $(c)"
         if options.ul.iterations == 0
-            options.ul.iterations = options.ul.f_calls_limit ÷ parameters.K
+            options.ul.iterations = 1 + options.ul.f_calls_limit ÷ parameters.K
         end
     end
 
