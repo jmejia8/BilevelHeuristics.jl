@@ -182,6 +182,7 @@ function initialize!(
 
     for i in 1:parameters.N
         x = X[i,:]
+        options.ul.debug && @info "Solving LL problem for soluton $i/$N"
         ll_sols = LowerLevelSABO.lower_level_optimizer(status, parameters, problem, information, options, x, true)
         for ll_sol in ll_sols
             ll_sol_improved = BFGS_LL(x, ll_sol.x, parameters, problem, information, options)
@@ -294,7 +295,7 @@ function surrogate_search!(
     # -------------------------------------------------------------
     x_initial = (leader_pos(status.best_sol) - a) ./ (b - a)
     optimizer = Optim.Fminbox(Optim.BFGS())
-    res = Optim.optimize(F̂, a, b, x_initial, optimizer, Optim.Options(outer_iterations = 1))
+    res = Optim.optimize(F̂, zeros(length(a)), ones(length(a)), x_initial, optimizer, Optim.Options(outer_iterations = 1))
     p = a .+ (b - a) .* res.minimizer
 
     
