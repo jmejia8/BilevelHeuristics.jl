@@ -331,6 +331,15 @@ end
 
 function stop_criteria!(status, parameters::QBCA, problem, information, options)
     status.stop = status.stop || fitness_variance_stop_check(status, information, options)
+
+    if !isnan(information.ul.f_optimum)
+        # nothing to do.  ul_diff_check should not be applied
+        # when optimum is known
+        return
+    else
+        status.stop = status.stop || ul_diff_check(status, information, options)
+    end
+    
     return 
 end
 

@@ -159,3 +159,7 @@ function findworst(population, is_better)
 
     return i_worst
 end
+
+function Metaheuristics.is_feasible(A::BLIndividual)
+    Metaheuristics.is_feasible(A.ul) && Metaheuristics.is_feasible(A.ll)
+end
