@@ -1,5 +1,5 @@
 """
-    optimize(F, f, bounds_ul bounds_ll method = BCA(); logger = (status) -> nothing)
+    optimize(F, f, bounds_ul, bounds_ll, method = BCA(); logger = (status) -> nothing)
 
 Approximate an optimal solution for the bilevel optimization problem `x ∈ argmin F(x, y)` with
 `x ∈ bounds_ul` subject to `y ∈ argmin{f(x,y) : y ∈ bounds_ll}`.

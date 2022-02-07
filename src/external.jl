@@ -1,6 +1,6 @@
-import Metaheuristics
-import Metaheuristics: initialize!, update_state!, final_stage!, stop_criteria!, optimize
-import Metaheuristics: NSGA2, SMS_EMOA, SPEA2, AbstractSolution
+using Reexport
+@reexport using Metaheuristics
+import Metaheuristics: initialize!, update_state!, final_stage!, stop_criteria!, optimize, AbstractSolution
 import Random: seed!, randperm
 import Base: show, minimum
 import Printf: @printf
