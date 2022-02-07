@@ -70,6 +70,11 @@ julia> y
 julia> Fmin, fmin = minimum(res)
 (3.9553637806596925e-7, 9.212297088378278e-11)
 ```
+
+## Citation
+> Mejía-de-Dios, J. A., Mezura-Montes, E., & Toledo-Hernández, P. (2022).
+> Pseudo-feasible solutions in evolutionary bilevel optimization: Test problems and
+> performance assessment. Applied Mathematics and Computation, 412, 126577.
 """
 mutable struct QBCA2 <: Metaheuristics.AbstractParameters
     N::Int

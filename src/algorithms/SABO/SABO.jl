@@ -74,6 +74,11 @@ julia> y
 julia> Fmin, fmin = minimum(res)
 (0.004720277765002139, 0.0006417493438175533)
 ```
+
+## Citation
+> Mejía-de-Dios, J. A., & Mezura-Montes, E. (2020, June). A surrogate-assisted
+> metaheuristic for bilevel optimization. In Proceedings of the 2020 Genetic and
+> Evolutionary Computation Conference (pp. 629-635).
 """
 mutable struct SABO <: Metaheuristics.AbstractParameters
     N::Int

@@ -72,6 +72,11 @@ julia> y
 julia> Fmin, fmin = minimum(res)
 (1.2027656204730873e-6, 1.8617960564375732e-8)
 ```
+
+## Citation
+> Mejía-de-Dios, J. A., & Mezura-Montes, E. (2019, June). A metaheuristic for bilevel
+> optimization using tykhonov regularization and the quasi-newton method. In 2019 IEEE
+> Congress on Evolutionary Computation (CEC) (pp. 3134-3141). IEEE.
 """
 mutable struct QBCA <: Metaheuristics.AbstractParameters
     N::Int

@@ -70,6 +70,11 @@ julia> y
 julia> Fmin, fmin = minimum(res)
 (2.7438003987697017e-9, 3.9487399650845625e-11)
 ```
+
+## Citation
+> Mejía-de-Dios, J. A., & Mezura-Montes, E. (2018, November). A physics-inspired algorithm
+> for bilevel optimization. In 2018 IEEE International Autumn Meeting on Power, Electronics
+> and Computing (ROPEC) (pp. 1-6). IEEE.
 """
 mutable struct BCA <: Metaheuristics.AbstractParameters
     N::Int
