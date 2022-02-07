@@ -92,9 +92,11 @@ mutable struct SABO <: Metaheuristics.AbstractParameters
     autodiff::Symbol # :finite or :forward
     use_surrogate_model::Bool
     λ::Float64
+    elite_surrogate::Metaheuristics.AbstractSolution
 end
 
 include("lower-level.jl")
+include("surrogate.jl")
 
 function SABO(;N = 0,
         K = 3,
@@ -112,7 +114,8 @@ function SABO(;N = 0,
         information_ll = Metaheuristics.Information()
     )
 
-    parameters = SABO(N, K, η_max, δ1, δ2, ε1, ε2, t_reevaluate, autodiff, true,λ)
+    elite_surrogate = Metaheuristics.create_child(zeros(0), Inf)
+    parameters = SABO(N, K, η_max, δ1, δ2, ε1, ε2, t_reevaluate, autodiff, true,λ,elite_surrogate)
 
 
     return Algorithm(parameters;
@@ -122,23 +125,12 @@ function SABO(;N = 0,
 end
 
 
-function is_better_qbca2(A, B, parameters::SABO)
-    ΔF = abs(leader_f(A) - leader_f(B))
-    Δf = abs(follower_f(A) - follower_f(B))
-
-    Δx = leader_pos(A) - leader_pos(B)
-    Δy = follower_pos(A) - follower_pos(B)
-
+function is_better(A, B, parameters::SABO)
     δ1 = parameters.δ1
     δ2 = parameters.δ2
     ε1 = parameters.ε1
     ε2 = parameters.ε2
-
-    if Δf < ε2 && ΔF < ε1 && norm(Δx) < δ1 && norm(Δy) > δ2
-        return false
-    end
-
-    return leader_f(A) < leader_f(B) 
+    return !is_pseudo_feasible(A,B,δ1, δ2, ε1, ε2) && leader_f(A) < leader_f(B) 
 end
 
 
@@ -200,28 +192,12 @@ function initialize!(
 
     population = [s for s in population_]
 
-    truncate_population!(status, parameters, problem, information, options, (a, b) -> is_better_qbca2(a,b, parameters))
+    truncate_population!(status, parameters, problem, information, options, (a, b) -> is_better(a,b, parameters))
     
     best = Metaheuristics.get_best(population)
+    parameters.elite_surrogate = best
     return BLState(best, population) # replace this
 end
-
-
-function center_ul(U, parameters::SABO)
-    fitness = map(u -> leader_f(u), U)
-    mass = Metaheuristics.fitnessToMass(fitness)
-
-    d = length(leader_pos(U[1]))
-
-    c = zeros(Float64, d)
-
-    for i = 1:length(mass)
-        c += mass[i] .* leader_pos(U[i])
-    end
-
-    return c / sum(mass), argmin(mass)
-end
-
 
 function reevaluate!(
         status,
@@ -237,32 +213,49 @@ function reevaluate!(
     end
 
 
-    options.ul.debug && @info "Re-evaluating best solution..."
+    options.ul.debug && @info "Re-evaluating elite solution (according surrogate model)..."
 
-    x, y_best = minimizer(status)
-    ll_sol = LowerLevelSABO.gen_optimal_sabo(x, problem, [status.best_sol])
+    elite_surrogate = parameters.elite_surrogate
+    x, y = leader_pos(elite_surrogate), follower_pos(elite_surrogate)
+    ll_sol = LowerLevelSABO.gen_optimal_sabo(x, problem, [elite_surrogate])
 
     sol = create_solution(x, ll_sol, problem)
-    status.best_sol.ul = sol.ul
-    status.best_sol.ll = sol.ll
 
-    y = ll_sol.x
-    if norm(y - y_best) < 1e-2
+    if is_better_naive(sol, status.best_sol)
+        options.ul.debug && @info "Surrogate: Success finding elite."
+        status.best_sol = sol
+        parameters.elite_surrogate = sol
         return
     end
 
+    # check if reevaluation is required
+    # y_improved = Metaheuristics.get_position(ll_sol)
+    # dd = norm(y_improved - y)
+    # if dd < 1e-2
+    #     options.ul.debug && @info "Surrogate: Not necessary evaluate population due to tol=$dd."
+    #     return
+    # end
+
     options.ul.debug && @info "Re-evaluating entire population ..."
 
+    for (i, sol) in enumerate(status.population)
 
-    for sol in status.population
         ll_sol = LowerLevelSABO.gen_optimal_sabo(leader_pos(sol), problem, [sol])
         sol_new = create_solution(leader_pos(sol), ll_sol, problem)
 
-        sol.ul = sol_new.ul
-        sol.ll = sol_new.ll
+        # REMOVE
+        fy_improved = Metaheuristics.fval(ll_sol)
+        fy = follower_f(sol)
+        
+        ff = abs(fy_improved - fy)
+        fy_improved < fy && @show "Reevaluation worths Δf = $ff"
+        # REMOVE (end)
 
-        if leader_f(status.best_sol) > leader_f(sol)
-            status.best_sol = sol
+        status.population[i] = sol_new
+
+        if is_better_naive(sol_new, status.best_sol) #leader_f(status.best_sol) > leader_f(sol)
+            status.best_sol = sol_new
+            parameters.elite_surrogate = sol_new
             options.ul.debug && @info "Best solution found in reevaluation."
         end
 
@@ -270,66 +263,6 @@ function reevaluate!(
 
 end
 
-
-function surrogate_search!(
-        status,
-        parameters::SABO,
-        problem,
-        information,
-        options,
-        args...;
-        kargs...)
-
-    N = length(status.population)
-    a = problem.ul.bounds[1,:]
-    b = problem.ul.bounds[2,:]
-
-    X = zeros(N, length(a))# map(sol -> leader_pos(sol)', status.population)
-    for i = 1:N
-        X[i,:] = leader_pos(status.population[i])
-    end
-    
-
-    y = map(sol -> leader_f(sol), status.population)
-    
-    X = (X .- a') ./ (b - a)'
-    method = BiApprox.KernelInterpolation(y, X, λ = 1e-5)
-    BiApprox.train!(method)
-    F̂ = BiApprox.approximate(method)
-
-    # -------------------------------------------------------------
-    # -------------------------------------------------------------
-    # -------------------------------------------------------------
-    x_initial = (leader_pos(status.best_sol) - a) ./ (b - a)
-    optimizer = Optim.Fminbox(Optim.BFGS())
-    res = Optim.optimize(F̂, zeros(length(a)), ones(length(a)), x_initial, optimizer, Optim.Options(outer_iterations = 1))
-    p = a .+ (b - a) .* res.minimizer
-
-    
-    if norm(p - leader_pos(status.best_sol)) < 1e-2
-        # nothing to do
-        options.ul.debug && @info "Surrogate-based improvement not necessary."
-        return
-    end
-    
-
-    ll_sols = LowerLevelSABO.lower_level_optimizer(status, parameters, problem, information, options, p, true)
-
-    sol = create_solution(p, ll_sols[1], problem)
-
-    if leader_f(sol) < leader_f(status.best_sol)
-        fv1 = leader_f(status.best_sol)
-
-        status.best_sol.ul = sol.ul
-        status.best_sol.ll = sol.ll
-
-        fv2 = leader_f(sol) 
-        options.ul.debug && @info "Surrogate-based improvement success. $fv1 --> $fv2"
-    else
-        options.ul.debug && @warn "Surrogate-based improvement failed."
-    end
-
-end
 
 function update_state!(
         status,
@@ -352,45 +285,52 @@ function update_state!(
     I = randperm(parameters.N)
     J = randperm(parameters.N)
 
-    is_better(a, b) = is_better_qbca2(a,b, parameters)
+    # is_better(a, b) = is_better(a,b, parameters)
     
     population = status.population
     # success_rate = 0.0
 
     K = parameters.K
     for i in 1:parameters.N
-
+        # compute center
         U = Metaheuristics.getU(population, K, I, i, parameters.N)
-        # stepsize
-        ηX = parameters.η_max * rand()
-
-
         cX, u_worst = center_ul(U, parameters)
+        # step size
+        ηX = parameters.η_max * rand()
 
         # u: worst element in U
         u = leader_pos(U[u_worst])
-
         x = leader_pos(population[i])
+
+        # candidate solution
         p = x .+ ηX .* (cX .- u)
         Metaheuristics.replace_with_random_in_bounds!(p, problem.ul.bounds)
+        # optimize lower level
         ll_sols = LowerLevelSABO.lower_level_optimizer(status, parameters, problem, information, options, p)
-
 
         for ll_sol in ll_sols
             sol = create_solution(p, ll_sol, problem)
 
-            if is_better_qbca2(sol, status.population[i], parameters)
-                i_worst = findworst(status.population, is_better)
+            if is_better_naive(sol, status.population[i])
+                i_worst = findworst(status.population, is_better_naive)
                 status.population[i_worst] = sol
-
-
-                if is_better_qbca2(sol, status.best_sol, parameters)
-                    status.best_sol = sol
-                end
+            end
+            
+            if is_better(sol, parameters.elite_surrogate, parameters)
+                # update elite_surrogate (in surrogate)
+                parameters.elite_surrogate = sol
+                # check if elite_surrogate is close to true optimum
+                best_feasible = status.best_sol
+                status.best_sol = sol
+                is_accurate = accuracy_stop_check(status, information, options)
+                status.stop = status.stop || is_accurate
+                status.stop && return 
+                # best_sol is always feasible
+                status.best_sol = best_feasible
             end
 
         end
-        
+
     end
 
     reevaluate!(status, parameters, problem, information, options)

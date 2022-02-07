@@ -163,3 +163,20 @@ end
 function Metaheuristics.is_feasible(A::BLIndividual)
     Metaheuristics.is_feasible(A.ul) && Metaheuristics.is_feasible(A.ll)
 end
+
+is_better_naive(A::BLIndividual, B::BLIndividual) = leader_f(A) < leader_f(B)
+
+function is_pseudo_feasible(A::BLIndividual, B::BLIndividual,δ1, δ2, ε1, ε2)
+
+    ΔF = abs(leader_f(A) - leader_f(B))
+    Δf = abs(follower_f(A) - follower_f(B))
+
+    Δx = leader_pos(A) - leader_pos(B)
+    Δy = follower_pos(A) - follower_pos(B)
+
+    if Δf < ε2 && ΔF < ε1 && norm(Δx) < δ1 && norm(Δy) > δ2
+        return true
+    end
+
+    false
+end
