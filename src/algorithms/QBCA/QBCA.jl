@@ -90,6 +90,7 @@ mutable struct QBCA <: Metaheuristics.AbstractParameters
 end
 
 include("lower-level.jl")
+include("utils.jl")
 
 function QBCA(;N = 0,
         K = 3,
@@ -111,16 +112,6 @@ function QBCA(;N = 0,
                      options = BLOptions(options_ul, options_ll),
                      information = BLInformation(information_ul, information_ll)
                     )
-end
-
-
-function is_better_qbca(A::BLIndividual, B::BLIndividual, parameters)
-    α = parameters.α
-    QxyA = α*leader_f(A) + follower_f(A)
-    QxyB = α*leader_f(B) + follower_f(B)
-
-    return QxyA < QxyB
-
 end
 
 
@@ -167,7 +158,7 @@ function initialize!(
 
     population_ = []
 
-    # only for initializaton
+    # only for initialization
     bca = BCA(N, 3*D, 3, parameters.η_ul_max, resize_population)
 
     for i in 1:parameters.N
@@ -186,60 +177,6 @@ function initialize!(
     best = Metaheuristics.get_best(population)
     return BLState(best, population) # replace this
 end
-
-
-function nearest(P, x; tol = 1e-16)
-    x_nearest = leader_pos(P[1])
-    y = follower_pos(P[1])
-    d = Inf
-
-    for sol in P
-        n = norm(x - leader_pos(sol))
-
-        n >= d && (continue)
-
-        x_nearest = leader_pos(sol)
-        y = follower_pos(sol)
-        d = n
-
-        d <= tol && (break)
-
-    end
-
-    y, d
-end
-
-function center_ul(U, parameters::QBCA)
-    fitness = map(u -> leader_f(u) + parameters.β*follower_f(u), U)
-    mass = Metaheuristics.fitnessToMass(fitness)
-
-    d = length(leader_pos(U[1]))
-
-    c = zeros(Float64, d)
-
-    for i = 1:length(mass)
-        c += mass[i] .* leader_pos(U[i])
-    end
-
-    return c / sum(mass), argmin(mass)
-end
-
-
-function center_ll(U, parameters::QBCA)
-    fitness = map(u -> parameters.α * leader_f(u) + follower_f(u), U)
-    mass = Metaheuristics.fitnessToMass(fitness)
-
-    d = length(follower_pos(U[1]))
-
-    c = zeros(Float64, d)
-
-    for i = 1:length(mass)
-        c += mass[i] .* follower_pos(U[i])
-    end
-
-    return c / sum(mass), argmin(mass)
-end
-
 
 function update_state!(
         status,
@@ -275,22 +212,22 @@ function update_state!(
 
     K = parameters.K
     for i in 1:parameters.N
-
+        # center of mass
         U = Metaheuristics.getU(population, K, I, i, parameters.N)
         V = Metaheuristics.getU(population, K, J, i, parameters.N)
+        cX, u_worst = center_ul(U, parameters)
+        cY, v_worst = center_ll(V, parameters)
+
         # stepsize
         ηX = parameters.η_ul_max * rand()
         ηY = parameters.η_ll_max * rand()
 
-
-        cX, u_worst = center_ul(U, parameters)
-        cY, v_worst = center_ll(V, parameters)
-
         # u: worst element in U
         u = leader_pos(U[u_worst])
         v = follower_pos(V[v_worst])
-
         x = leader_pos(population[i])
+
+        # solution candidate
         p = x .+ ηX .* (cX .- u)
         Metaheuristics.replace_with_random_in_bounds!(p, problem.ul.bounds)
 
@@ -318,18 +255,8 @@ function update_state!(
                     status.best_sol = sol
                 end
             end
-
-
-        end
-        
-
-
- 
+        end 
     end
-
-    # truncate_population!(status, parameters, problem, information, options, (a, b) -> is_better_qbca(a,b, parameters))
-    
-
 
 end
 

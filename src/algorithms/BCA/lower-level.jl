@@ -1,5 +1,5 @@
 function lower_level_optimizer(
-        status, # an initialized State (if apply)
+        status,
         parameters::BCA,
         problem,
         information,
@@ -18,15 +18,22 @@ function lower_level_optimizer(
     K = parameters.K
     η_max = parameters.η_max
     opts_ll = options.ll
-    info_ll = information.ll
-
+    
+    # lower level parameters
     method = Metaheuristics.ECA(;N, η_max, K,
                                 p_bin=0.0,
                                 p_exploit=2.0,
                                 resize_population = parameters.resize_population,
-                                options = opts_ll,
-                                information = info_ll)
+                                options = opts_ll)
+    # perform optimization
     res = Metaheuristics.optimize( ff, problem.ll.bounds, method)
+
+    ############# updated to handle multi-modal problems at lower level #################
+    return handle_ll_multimodality(res, problem, options) 
+
+end
+
+function handle_ll_multimodality(res, problem, options) 
 
     fmin = Metaheuristics.minimum(res)
 
@@ -34,11 +41,10 @@ function lower_level_optimizer(
     mask = findall( v -> abs(v - fmin) < 1e-12, fs)
 
     if isnothing(mask) || length(mask) == 1
+        # unique LL optimum detected
         return [res.best_sol]
     end
 
-
-    ############# updated to handle multi-modal problems at lower level #################
     ll_sols = [res.best_sol]
 
     # for normalization
@@ -63,12 +69,12 @@ function lower_level_optimizer(
         save_sol && push!(ll_sols, candidate)
     end
 
+    unique!(ll_sols)
     
     n = length(ll_sols)
     options.ul.debug && n > 1 && @info "Lower level seems multimodal ($n optimums)."
     
-     
     return ll_sols
-
 end
+
 

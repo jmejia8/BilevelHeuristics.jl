@@ -85,6 +85,7 @@ mutable struct BCA <: Metaheuristics.AbstractParameters
 end
 
 include("lower-level.jl")
+include("utils.jl")
 
 function BCA(;N = 0, n=0, K = 7, η_max=2.0, resize_population = true,
         options_ul = Metaheuristics.Options(),
@@ -100,28 +101,6 @@ function BCA(;N = 0, n=0, K = 7, η_max=2.0, resize_population = true,
         options = BLOptions(options_ul, options_ll),
         information = BLInformation(information_ul, information_ll)
     )
-end
-
-
-function is_better_bca(A::BLIndividual, B::BLIndividual)
-    QxyA = leader_f(A) + follower_f(A)
-    QxyB = leader_f(B) + follower_f(B)
-
-    return QxyA < QxyB
-
-end
-
-
-function truncate_population!(status, parameters, problem, information, options, is_better)
-    if parameters.N == length(status.population)
-        return
-    end
-
-    N = parameters.N
-    sort!(status.population, lt = is_better)
-    deleteat!(status.population, N + 1:length(status.population))
-
-    return
 end
 
 
@@ -186,21 +165,6 @@ function initialize!(
 end
 
 
-function center_ul(U, parameters::BCA)
-    fitness = map(u -> leader_f(u) + follower_f(u), U)
-    mass = Metaheuristics.fitnessToMass(fitness)
-
-    d = length(leader_pos(U[1]))
-
-    c = zeros(Float64, d)
-
-    for i = 1:length(mass)
-        c += mass[i] .* leader_pos(U[i])
-    end
-
-    return c / sum(mass), argmin(mass)
-end
-
 function update_state!(
         status,
         parameters::BCA,
@@ -211,33 +175,26 @@ function update_state!(
         kargs...
     )
 
-
-    a = problem.ul.bounds[1,:]
-    b = problem.ul.bounds[2,:]
-    D = length(a)
-
+    D = size(problem.ul.bounds, 2)
     I = randperm(parameters.N)
-
-    population = status.population
-
     p = status.F_calls / options.ul.f_calls_limit
     K = parameters.K
-    for i in 1:parameters.N
+    population = status.population
 
+    for i in 1:parameters.N
+        # compute center of mass
         U = Metaheuristics.getU(population, K, I, i, parameters.N)
         # stepsize
         η = parameters.η_max * rand()
-
-
         c, u_worst = center_ul(U, parameters)
-
         # u: worst element in U
         u = leader_pos(U[u_worst])
 
+        # new solution
         x = leader_pos(population[i]) .+ η .* (c .- u)
-
         Metaheuristics.replace_with_random_in_bounds!(x, problem.ul.bounds)
-
+        
+        # optimize lower leve
         ll_sols = lower_level_optimizer(status, parameters, problem, information, options, x)
 
         for ll_sol in ll_sols
@@ -248,13 +205,10 @@ function update_state!(
                 status.best_sol = sol
             end
         end
-
-
     end
 
     parameters.N = round(Int, parameters.K*(D - (D-2)*p))
     truncate_population!(status, parameters, problem, information, options, is_better_bca)
-
 end
 
 function stop_criteria!(status, parameters::BCA, problem, information, options)

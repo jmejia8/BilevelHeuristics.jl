@@ -29,8 +29,6 @@ function lower_level_optimizer(
         kargs...
     )
 
-
-
     sol = BFGS_LL(x, y0, parameters, problem, information, options)
     return [sol]
 
