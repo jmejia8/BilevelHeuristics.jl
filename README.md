@@ -11,11 +11,11 @@ Bilevel Optimization (BO).
 ## Installation
 
 
-Open the Julia (Julia 1.2 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
+Open the Julia (Julia 1.6 or later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 
 
 Type `]`  
-```julia
+```julia-repl
 pkg> add https://github.com/jmejia8/BilevelHeuristics.jl.git
 ```
 
@@ -33,8 +33,8 @@ Current implemented Bilevel Metaheuristics include:
 - [x] [QBCA](https://doi.org/10.1109/CEC.2019.8790097): BCA with a lower-level Quasi-Newton optimization method.
 - [x] [QBCA2](https://doi.org/10.1016/j.amc.2021.126577): Improved QBCA (implements conditions to avoid pseudo-feasible solutions)
 - [x] [SABO](https://doi.org/10.1145/3377930.3390236): Surrogate-assisted Bilevel Optimization.
-- [x] [BLEMO]: Bilevel Evolutionary Multi-objective Optimization
-- [ ] [SMS-MOBO]: S-metic-selection-based Multi-objective Bilevel Optimization.
+- [x]  BLEMO: Bilevel Evolutionary Multi-objective Optimization
+- [ ]  SMS-MOBO: S-metic-selection-based Multi-objective Bilevel Optimization.
 
 ## Example
 
