@@ -11,18 +11,19 @@ Bilevel Optimization (BO).
 ## Installation
 
 
-Open the Julia (Julia 1.6 or later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
+Open the Julia REPL (Julia 1.6 or later) and press `]` to open the Pkg prompt. To add this
+package, use the `add` command:
 
 
 Type `]`  
 ```julia-repl
-pkg> add https://github.com/jmejia8/BilevelHeuristics.jl.git
+pkg> add BilevelHeuristics
 ```
 
 Or, equivalently, via the `Pkg` API:
 
 ```julia
-julia> import Pkg; Pkg.add("https://github.com/jmejia8/BilevelHeuristics.jl.git")
+julia> import Pkg; Pkg.add("BilevelHeuristics")
 ```
 
 ## Algorithms
