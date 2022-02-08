@@ -3,28 +3,28 @@ module LowerLevelSABO
 import LinearAlgebra: norm
 import Metaheuristics
 import Statistics: var
-import ..follower_pos, ..leader_pos, ..gen_optimal
+import ..follower_pos, ..leader_pos, ..gen_optimal, ..SECA
 
-function gen_optimal_sabo(x, problem, local_population)
+function gen_optimal_sabo(x, parameters, problem, local_population=[], accurate=false)
     f(y) = Metaheuristics.evaluate(x, y, problem.ll) 
 
     bounds = problem.ll.bounds
     D = size(bounds, 2)
+    K = parameters.K
 
-    if length(local_population) < D
+    if accurate || length(local_population) < D
         f_calls_limit = 1000D
-        K = 7
+        N = 2K * D
     else
-        K = 3
+        N = K * D
         f_calls_limit = 100D
     end
     
     η_max = 1.2
-    N = K * D
 
-    eca = Metaheuristics.ECA(K = K, N = N, η_max = η_max)
+    eca = SECA(;K = K, N = N, η_max = η_max)
 
-    if !isnothing(local_population)
+    if !isempty(local_population)
         # prior information
         population = []
         for i = 1:length(local_population)
@@ -39,7 +39,7 @@ function gen_optimal_sabo(x, problem, local_population)
             push!(population, Metaheuristics.generateChild(y, f(y)))
         end
         # tell eca you have generated solutions
-        eca.parameters.N = length(population)
+        # eca.parameters.N = length(population)
         eca.status = Metaheuristics.State(Metaheuristics.get_best(population), population)
 
     end
@@ -82,15 +82,17 @@ function lower_level_optimizer(
     )
 
     D = size(problem.ll.bounds, 2)
+    N = length(status.population)
 
-    if !accurate && length(status.population) > D
+    C = []
+
+    if N > D
         distances = map( sol -> norm( leader_pos(sol) - p), status.population )
         I = sortperm(distances)
-        C = status.population[I[1:D]] # the nearest to p
-        sol = gen_optimal_sabo(p, problem, C)
-    else
-        sol = gen_optimal(p, problem, parameters, options)
+        C = status.population[I[1:D]] # the nearest solutions to p
     end
+
+    sol = gen_optimal_sabo(p, parameters, problem, C, accurate)
 
     return [sol]
 

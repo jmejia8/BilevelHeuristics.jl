@@ -106,7 +106,7 @@ function SABO(;N = 0,
         ε1 = 1e-2,
         ε2 = 1e-2,
         λ = 1e-5,
-        t_reevaluate=10,
+        t_reevaluate=5,
         autodiff = :finite,
         options_ul = Metaheuristics.Options(),
         options_ll = Metaheuristics.Options(),
@@ -217,7 +217,7 @@ function reevaluate!(
 
     elite_surrogate = parameters.elite_surrogate
     x, y = leader_pos(elite_surrogate), follower_pos(elite_surrogate)
-    ll_sol = LowerLevelSABO.gen_optimal_sabo(x, problem, [elite_surrogate])
+    ll_sol = LowerLevelSABO.gen_optimal_sabo(x, parameters, problem, [elite_surrogate])
 
     sol = create_solution(x, ll_sol, problem)
 
@@ -228,27 +228,17 @@ function reevaluate!(
         return
     end
 
-    # check if reevaluation is required
-    # y_improved = Metaheuristics.get_position(ll_sol)
-    # dd = norm(y_improved - y)
-    # if dd < 1e-2
-    #     options.ul.debug && @info "Surrogate: Not necessary evaluate population due to tol=$dd."
-    #     return
-    # end
 
     options.ul.debug && @info "Re-evaluating entire population ..."
 
     for (i, sol) in enumerate(status.population)
 
-        ll_sol = LowerLevelSABO.gen_optimal_sabo(leader_pos(sol), problem, [sol])
+        ll_sol = LowerLevelSABO.gen_optimal_sabo(leader_pos(sol), parameters, problem, [sol])
         sol_new = create_solution(leader_pos(sol), ll_sol, problem)
 
         # REMOVE
         fy_improved = Metaheuristics.fval(ll_sol)
-        fy = follower_f(sol)
-        
-        ff = abs(fy_improved - fy)
-        fy_improved < fy && @show "Reevaluation worths Δf = $ff"
+        fy = follower_f(sol)        
         # REMOVE (end)
 
         status.population[i] = sol_new
@@ -257,6 +247,13 @@ function reevaluate!(
             status.best_sol = sol_new
             parameters.elite_surrogate = sol_new
             options.ul.debug && @info "Best solution found in reevaluation."
+        end
+
+        if fy_improved < fy
+            ff = abs(fy_improved - fy)
+            options.ul.debug && @info "Reevaluation worths Δf = $ff"
+        elseif fy_improved ≈ fy
+            break
         end
 
     end
