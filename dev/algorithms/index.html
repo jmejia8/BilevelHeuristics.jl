@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Algorithms · BilevelHeuristics.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">BilevelHeuristics.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Index</a></li><li class="is-active"><a class="tocitem" href>Algorithms</a></li><li><a class="tocitem" href="../api/">API References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Algorithms</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Algorithms</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jmejia8/BilevelHeuristics.jl/blob/master/docs/src/algorithms.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Algorithms"><a class="docs-heading-anchor" href="#Algorithms">Algorithms</a><a id="Algorithms-1"></a><a class="docs-heading-anchor-permalink" href="#Algorithms" title="Permalink"></a></h1><article class="docstring"><header><a class="docstring-binding" id="BilevelHeuristics.BCA" href="#BilevelHeuristics.BCA"><code>BilevelHeuristics.BCA</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">BCA(;N, n, K, η_max, resize_population)</code></pre><p>Bilevel Centers Algorithm uses two nested ECA.</p><p><strong>Parameters</strong></p><ul><li><code>N</code> Upper level population size</li><li><code>n</code> Lower level population size.</li><li><code>K</code> Num. of solutions to generate centers.</li><li><code>η_max</code> Step size.</li></ul><p><strong>Usage</strong></p><p>Upper level problem: <code>F(x,y)</code> with <code>x</code> as the upper-level vector.</p><pre><code class="language-julia-repl">julia&gt; F(x, y) = sum(x.^2) + sum(y.^2)
+F (generic function with 1 method)
+
+julia&gt; bounds_ul = [-ones(5) ones(5)];
+</code></pre><p>Lower level problem: <code>f(x, y)</code> with <code>y</code> as the lower-level vector.</p><pre><code class="language-julia-repl">julia&gt; f(x, y) = sum((x - y).^2) + y[1]^2
+f (generic function with 1 method)
+
+julia&gt; bounds_ll = [-ones(5) ones(5)];
+</code></pre><p>Approximate solution.</p><pre><code class="language-julia-repl">julia&gt; res = optimize(F, f, bounds_ul, bounds_ll, BCA())
++=========== RESULT ==========+
+  iteration: 108
+    minimum: 
+          F: 2.7438e-09
+          f: 3.94874e-11
+  minimizer: 
+          x: [-8.80414308649828e-6, 2.1574853199308744e-5, -1.5550602817418899e-6, 1.9314104453973864e-5, 2.1709393089480435e-5]
+          y: [-4.907639660543081e-6, 2.173986368018122e-5, -1.8133242873785074e-6, 1.9658451600356374e-5, 2.1624363965042988e-5]
+    F calls: 2503
+    f calls: 6272518
+    Message: Stopped due UL function evaluations limitations. 
+ total time: 14.8592 s
++============================+
+
+julia&gt; x, y = minimizer(res);
+
+julia&gt; x
+5-element Vector{Float64}:
+ -8.80414308649828e-6
+  2.1574853199308744e-5
+ -1.5550602817418899e-6
+  1.9314104453973864e-5
+  2.1709393089480435e-5
+
+julia&gt; y
+5-element Vector{Float64}:
+ -4.907639660543081e-6
+  2.173986368018122e-5
+ -1.8133242873785074e-6
+  1.9658451600356374e-5
+  2.1624363965042988e-5
+
+julia&gt; Fmin, fmin = minimum(res)
+(2.7438003987697017e-9, 3.9487399650845625e-11)</code></pre><p><strong>Citation</strong></p><blockquote><p>Mejía-de-Dios, J. A., &amp; Mezura-Montes, E. (2018, November). A physics-inspired algorithm for bilevel optimization. In 2018 IEEE International Autumn Meeting on Power, Electronics and Computing (ROPEC) (pp. 1-6). IEEE.</p></blockquote></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/BilevelHeuristics.jl/blob/6fcb7c90438613d7afd375ba4b7a44a62f5b0684/src/algorithms/BCA/BCA.jl#L1-L78">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="BilevelHeuristics.QBCA" href="#BilevelHeuristics.QBCA"><code>BilevelHeuristics.QBCA</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">QBCA(;N, K, η_ul_max, η_ll_max, α, β, autodiff)</code></pre><p>Quasi-newton BCA uses ECA (upper-level) and BFGS (lower-level).</p><p><strong>Parameters</strong></p><ul><li><code>N</code> Upper level population size</li><li><code>K</code> Num. of solutions to generate centers.</li><li><code>η_ul_max</code> UL step size.</li><li><code>η_ll_max</code> LL step size.</li><li><code>α, β</code> Parameters for the Tikhnonov regularization.</li><li><code>autodiff=:finite</code> Used to approximate LL derivates.</li></ul><p><strong>Usage</strong></p><p>Upper level problem: <code>F(x,y)</code> with <code>x</code> as the upper-level vector.</p><pre><code class="language-julia-repl">julia&gt; F(x, y) = sum(x.^2) + sum(y.^2)
+F (generic function with 1 method)
+
+julia&gt; bounds_ul = [-ones(5) ones(5)];
+</code></pre><p>Lower level problem: <code>f(x, y)</code> with <code>y</code> as the lower-level vector.</p><pre><code class="language-julia-repl">julia&gt; f(x, y) = sum((x - y).^2) + y[1]^2
+f (generic function with 1 method)
+
+julia&gt; bounds_ll = [-ones(5) ones(5)];
+</code></pre><p>Approximate solution.</p><pre><code class="language-julia-repl">julia&gt; res = optimize(F, f, bounds_ul, bounds_ll, QBCA())
++=========== RESULT ==========+
+  iteration: 71
+    minimum: 
+          F: 1.20277e-06
+          f: 1.8618e-08
+  minimizer: 
+          x: [-0.00019296602928680934, -0.00031720504506331244, 0.00047217689470620765, 0.00014459596611862214, 0.00048345619641040644]
+          y: [-9.647494056567316e-5, -0.0003171519406858993, 0.00047209784939209284, 0.00014457176048263256, 0.0004833752613377002]
+    F calls: 2130
+    f calls: 366743
+    Message: Stopped due UL small fitness variance. 
+ total time: 7.7909 s
++============================+
+
+julia&gt; x, y = minimizer(res);
+
+julia&gt; x
+5-element Vector{Float64}:
+ -0.00019296602928680934
+ -0.00031720504506331244
+  0.00047217689470620765
+  0.00014459596611862214
+  0.00048345619641040644
+
+julia&gt; y
+5-element Vector{Float64}:
+ -9.647494056567316e-5
+ -0.0003171519406858993
+  0.00047209784939209284
+  0.00014457176048263256
+  0.0004833752613377002
+
+julia&gt; Fmin, fmin = minimum(res)
+(1.2027656204730873e-6, 1.8617960564375732e-8)</code></pre><p><strong>Citation</strong></p><blockquote><p>Mejía-de-Dios, J. A., &amp; Mezura-Montes, E. (2019, June). A metaheuristic for bilevel optimization using tykhonov regularization and the quasi-newton method. In 2019 IEEE Congress on Evolutionary Computation (CEC) (pp. 3134-3141). IEEE.</p></blockquote></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/BilevelHeuristics.jl/blob/6fcb7c90438613d7afd375ba4b7a44a62f5b0684/src/algorithms/QBCA/QBCA.jl#L1-L80">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="BilevelHeuristics.QBCA2" href="#BilevelHeuristics.QBCA2"><code>BilevelHeuristics.QBCA2</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">QBCA2(;N, K, η_max, δ1, δ2, ε1, ε2, λ, t_reevaluate)</code></pre><p>Quasi-newton BCA uses ECA (upper-level) and BFGS (lower-level).</p><p><strong>Parameters</strong></p><ul><li><code>N</code> Upper level population size</li><li><code>K</code> Num. of solutions to generate centers.</li><li><code>η_max</code> Step size</li><li><code>δ1</code>, <code>δ2</code>, <code>ε1</code> <code>ε2</code> Parameters for conditions to avoid pseudo-feasible solutions.</li></ul><p><strong>Usage</strong></p><p>Upper level problem: <code>F(x,y)</code> with <code>x</code> as the upper-level vector.</p><pre><code class="language-julia-repl">julia&gt; F(x, y) = sum(x.^2) + sum(y.^2)
+F (generic function with 1 method)
+
+julia&gt; bounds_ul = [-ones(5) ones(5)];
+</code></pre><p>Lower level problem: <code>f(x, y)</code> with <code>y</code> as the lower-level vector.</p><pre><code class="language-julia-repl">julia&gt; f(x, y) = sum((x - y).^2) + y[1]^2
+f (generic function with 1 method)
+
+julia&gt; bounds_ll = [-ones(5) ones(5)];
+</code></pre><p>Approximate solution.</p><pre><code class="language-julia-repl">julia&gt; res = optimize(F, f, bounds_ul, bounds_ll, QBCA2())
++=========== RESULT ==========+
+  iteration: 59
+    minimum: 
+          F: 3.95536e-07
+          f: 9.2123e-11
+  minimizer: 
+          x: [-1.3573722472608445e-5, -0.00012074600446520904, -0.00035025471067487137, -0.0002315301345354928, -8.239473503719106e-5]
+          y: [-6.786860530140986e-6, -0.00012074599672993571, -0.00035025467380887673, -0.00023153010993486042, -8.239472729799499e-5]
+    F calls: 1775
+    f calls: 299157
+    Message: Stopped due UL small fitness variance. 
+ total time: 5.6968 s
++============================+
+
+julia&gt; x, y = minimizer(res);
+
+julia&gt; x
+5-element Vector{Float64}:
+ -1.3573722472608445e-5
+ -0.00012074600446520904
+ -0.00035025471067487137
+ -0.0002315301345354928
+ -8.239473503719106e-5
+
+julia&gt; y
+5-element Vector{Float64}:
+ -6.786860530140986e-6
+ -0.00012074599672993571
+ -0.00035025467380887673
+ -0.00023153010993486042
+ -8.239472729799499e-5
+
+julia&gt; Fmin, fmin = minimum(res)
+(3.9553637806596925e-7, 9.212297088378278e-11)</code></pre><p><strong>Citation</strong></p><blockquote><p>Mejía-de-Dios, J. A., Mezura-Montes, E., &amp; Toledo-Hernández, P. (2022). Pseudo-feasible solutions in evolutionary bilevel optimization: Test problems and performance assessment. Applied Mathematics and Computation, 412, 126577.</p></blockquote></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/BilevelHeuristics.jl/blob/6fcb7c90438613d7afd375ba4b7a44a62f5b0684/src/algorithms/QBCA2/QBCA2.jl#L1-L78">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="BilevelHeuristics.SABO" href="#BilevelHeuristics.SABO"><code>BilevelHeuristics.SABO</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">SABO(;N, K, η_max, δ1, δ2, ε1, ε2, λ, t_reevaluate)</code></pre><p>Surrogate Algorithm for Bilevel Optimization.</p><p><strong>Parameters</strong></p><ul><li><code>N</code> Upper level population size</li><li><code>K</code> Num. of solutions to generate centers.</li><li><code>η_max</code> Step size</li><li><code>δ1</code>, <code>δ2</code>, <code>ε1</code> <code>ε2</code> Parameters for conditions to avoid pseudo-feasible solutions.</li><li><code>λ</code> Parameter for the surrogate model.</li><li><code>t_reevaluate</code> Indicates how many iterations is reevaluated the lower level.</li></ul><p><strong>Usage</strong></p><p>Upper level problem: <code>F(x,y)</code> with <code>x</code> as the upper-level vector.</p><pre><code class="language-julia-repl">julia&gt; F(x, y) = sum(x.^2) + sum(y.^2)
+F (generic function with 1 method)
+
+julia&gt; bounds_ul = [-ones(5) ones(5)];
+</code></pre><p>Lower level problem: <code>f(x, y)</code> with <code>y</code> as the lower-level vector.</p><pre><code class="language-julia-repl">julia&gt; f(x, y) = sum((x - y).^2) + y[1]^2
+f (generic function with 1 method)
+
+julia&gt; bounds_ll = [-ones(5) ones(5)];
+</code></pre><p>Approximate solution.</p><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
+
+julia&gt; res = optimize(F, f, bounds_ul, bounds_ll, SABO(options_ul=Options(iterations=12)))
++=========== RESULT ==========+
+  iteration: 12
+    minimum: 
+          F: 0.00472028
+          f: 0.000641749
+  minimizer: 
+          x: [-0.03582594991950816, 0.018051141584692676, -0.030154879329873152, -0.017337812299467736, 0.004710839249040477]
+          y: [-0.017912974972476316, 0.018051141514328663, -0.030154879385452187, -0.017337812317661405, 0.004710839272021738]
+    F calls: 372
+    f calls: 513936
+    Message: Stopped due completed iterations. 
+ total time: 19.0654 s
++============================+
+
+julia&gt; x, y = minimizer(res);
+
+julia&gt; x
+5-element Vector{Float64}:
+ -0.03582594991950816
+  0.018051141584692676
+ -0.030154879329873152
+ -0.017337812299467736
+  0.004710839249040477
+
+julia&gt; y
+5-element Vector{Float64}:
+ -0.017912974972476316
+  0.018051141514328663
+ -0.030154879385452187
+ -0.017337812317661405
+  0.004710839272021738
+
+julia&gt; Fmin, fmin = minimum(res)
+(0.004720277765002139, 0.0006417493438175533)</code></pre><p><strong>Citation</strong></p><blockquote><p>Mejía-de-Dios, J. A., &amp; Mezura-Montes, E. (2020, June). A surrogate-assisted metaheuristic for bilevel optimization. In Proceedings of the 2020 Genetic and Evolutionary Computation Conference (pp. 629-635).</p></blockquote></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/BilevelHeuristics.jl/blob/6fcb7c90438613d7afd375ba4b7a44a62f5b0684/src/algorithms/SABO/SABO.jl#L1-L82">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Index</a><a class="docs-footer-nextpage" href="../api/">API References »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 10 February 2022 04:03">Thursday 10 February 2022</span>. Using Julia version 1.6.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
