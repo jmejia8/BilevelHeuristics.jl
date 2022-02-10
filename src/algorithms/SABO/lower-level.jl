@@ -22,7 +22,7 @@ function gen_optimal_sabo(x, parameters, problem, local_population=[], accurate=
     
     η_max = 1.2
 
-    eca = SECA(;K = K, N = N, η_max = η_max)
+    eca = SECA(;λ = parameters.λ,K = K, N = N, η_max = η_max)
 
     if !isempty(local_population)
         # prior information

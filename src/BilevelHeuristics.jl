@@ -3,9 +3,13 @@ module BilevelHeuristics
 export BCA, QBCA, QBCA2, SABO, optimize, minimum, minimizer
 export TestProblems, BLEMO
 
+# import dependencies
 include("external.jl")
-include("core.jl")
-include("stop.jl")
+
+# core
+include("core/core.jl")
+
+include("common/common.jl")
 include("optimize.jl")
 include("TestProblems/TestProblems.jl")
 include("BiApprox/BiApprox.jl")

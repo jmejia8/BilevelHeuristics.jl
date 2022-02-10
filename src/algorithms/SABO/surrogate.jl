@@ -19,7 +19,7 @@ function surrogate_search!(
     y = map(sol -> leader_f(sol), status.population)
     
     X = (X .- a') ./ (b - a)'
-    method = BiApprox.KernelInterpolation(y, X, λ = 1e-5)
+    method = BiApprox.KernelInterpolation(y, X, λ = parameters.λ)
     BiApprox.train!(method)
     F̂ = BiApprox.approximate(method)
 

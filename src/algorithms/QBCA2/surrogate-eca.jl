@@ -122,7 +122,7 @@ function Metaheuristics.final_stage!( status,
     nothing
 end
 
-function SECA(;λ = 0.0, kargs...)
+function SECA(;λ = 1e-5, kargs...)
     eca = Metaheuristics.ECA(;kargs...)
     parameters = SECA(eca.parameters, λ)
 
