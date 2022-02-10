@@ -18,7 +18,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 [compat]
 LineSearches = "7.1.1"
 MLKernels = "0.4.0"
-Metaheuristics = "3.1.2"
+Metaheuristics = "3.2.0"
 Optim = "1.6.1"
 Reexport = "1.2.2"
 julia = "^1.6"
