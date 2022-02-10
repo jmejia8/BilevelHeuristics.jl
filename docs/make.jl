@@ -20,4 +20,5 @@ makedocs(
 
 deploydocs(
            repo = "github.com/jmejia8/BilevelHeuristics.jl.git",
+           devbranch = "main",
           )
