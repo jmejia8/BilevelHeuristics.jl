@@ -1,4 +1,4 @@
-mutable struct BLIndividual{U, L} <: Metaheuristics.AbstractSolution
+mutable struct BLIndividual{U, L} <: AbstractSolution
     ul::U
     ll::L
 end
@@ -17,13 +17,66 @@ function create_solution(x, sol_ll, problem)
     return BLIndividual(sol_ul, sol_ll)
 end
 
-get_ul_population(pop::Vector{BLIndividual{U, L}}) where U where L = [sol.ul for sol in pop]
+"""
+    get_ul_population(population)
 
-leader_pos(A::BLIndividual)   = Metaheuristics.get_position(A.ul)
-follower_pos(A::BLIndividual) = Metaheuristics.get_position(A.ll)
+Return the upper level solutions.
+"""
+get_ul_population(pop::Vector) = [sol.ul for sol in pop]
+"""
+    get_ll_population(population)
 
-leader_f(A::BLIndividual)   = Metaheuristics.fval(A.ul)
-follower_f(A::BLIndividual) = Metaheuristics.fval(A.ll)
+Return the lower level solutions.
+"""
+get_ll_population(pop::Vector) = [sol.ll for sol in pop]
+
+"""
+    ulvector(A)
+
+Get upper-level decision vector.
+"""
+ulvector(A::AbstractSolution) = Metaheuristics.get_position(A.ul)
+
+"""
+    llvector(A)
+
+Get lower-level decision vector.
+"""
+llvector(A::AbstractSolution)  = Metaheuristics.get_position(A.ll)
+
+"""
+    ulfval(A)
+
+Get upper-level function value.
+"""
+ulfval(A::AbstractSolution) = Metaheuristics.fval(A.ul)
+
+"""
+    llfval(A)
+
+Get lower-level function value.
+"""
+llfval(A::AbstractSolution) = Metaheuristics.fval(A.ll)
+
+leader_pos(A::AbstractSolution  ) = ulvector(A)
+follower_pos(A::AbstractSolution) = llvector(A)
+
+leader_f(A::AbstractSolution  ) = ulfval(A)
+follower_f(A::AbstractSolution) = llfval(A)
+
+"""
+    ulpositions(population)
+
+Get upper-level decision vectors from population.
+"""
+ulpositions(pop::Vector) = Metaheuristics.positions(get_ul_population(pop))
+
+"""
+    llpositions(population)
+
+Get lower-level decision vectors from population.
+"""
+llpositions(pop::Vector) = Metaheuristics.positions(get_ll_population(pop))
 
 """
     is_pseudo_feasible(A, B, δ1, δ2, ε1, ε2)

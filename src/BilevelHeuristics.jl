@@ -3,6 +3,10 @@ module BilevelHeuristics
 export BCA, QBCA, QBCA2, SABO, optimize, minimum, minimizer
 export TestProblems, BLEMO
 
+export get_ll_population, get_ul_population,ulvector,llvector,ulfval,llfval,ulpositions
+export ulpositions,llpositions,is_pseudo_feasible
+export BLState, BLOptions, BLInformation
+
 # import dependencies
 include("external.jl")
 

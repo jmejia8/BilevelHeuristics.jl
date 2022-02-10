@@ -3,6 +3,12 @@ mutable struct BLProblem <: Metaheuristics.AbstractProblem
     ll::Metaheuristics.Problem
 end
 
+"""
+    BLInformation(ul, ll)
+
+`BLInformation` stores information `Information` about problems at each level (upper
+and lower level).
+"""
 struct BLInformation
     ul::Metaheuristics.Information
     ll::Metaheuristics.Information
@@ -16,6 +22,12 @@ function Base.show(io::IO, blinfo::BLInformation)
     Base.show(io, blinfo.ll) 
 end
 
+"""
+    BLOptions(ul, ll)
+
+`BLOptions` stores common settings `Options` for metaheuristics at each level (upper
+and lower level).
+"""
 struct BLOptions
     ul::Metaheuristics.Options
     ll::Metaheuristics.Options
