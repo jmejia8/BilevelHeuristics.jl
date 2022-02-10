@@ -1,0 +1,6 @@
+[deps]
+BilevelHeuristics = "61682c44-1689-4c10-8e1b-162e0db5231e"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+
+[compat]
+Documenter = "0.25"
