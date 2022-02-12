@@ -1,4 +1,5 @@
 include("stop.jl")
+include("initial_state.jl")
 
 function Metaheuristics.evaluate(x, y, problem)
     problem.f_calls += 1

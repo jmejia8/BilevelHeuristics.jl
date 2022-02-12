@@ -141,27 +141,10 @@ function initialize!(
             options.ll.iterations = options.ll.f_calls_limit ÷ parameters.K
         end
     end
-    #################
 
-    N = parameters.N
-
-    X = a .+ (b - a) .* rand(N, D)
-
-    population_ = []
-    for i in 1:parameters.N
-        x = X[i,:]
-        ll_sols = lower_level_optimizer(status, parameters, problem, information, options, x)
-        for ll_sol in ll_sols
-            push!(population_, create_solution(x, ll_sol, problem))
-        end
-    end
-    population = [s for s in population_]
-
-
+    status = gen_initial_state(status,problem,parameters,information,options)
     truncate_population!(status, parameters, problem, information, options, is_better_bca)
-
-    best = Metaheuristics.get_best(population)
-    return BLState(best, population) # replace this
+    status
 end
 
 
