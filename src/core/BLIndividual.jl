@@ -98,8 +98,31 @@ function is_pseudo_feasible(A::BLIndividual, B::BLIndividual, δ1, δ2, ε1, ε2
 end
 
 is_better_naive(A::BLIndividual, B::BLIndividual) = leader_f(A) < leader_f(B)
-Metaheuristics.is_better(A::BLIndividual, B::BLIndividual) = is_better_naive(A, B)
 
+function Metaheuristics.is_better(A::BLIndividual, B::BLIndividual)
+    A_vio = Metaheuristics.sum_violations(A)
+    B_vio = Metaheuristics.sum_violations(B)
+
+    if A_vio < B_vio
+        return true
+    elseif B_vio < A_vio
+        return false
+    end
+
+    Metaheuristics.is_better(A.ul, B.ul)
+end
+
+
+function Metaheuristics.sum_violations(A::BLIndividual{T,T}) where T <: Metaheuristics.AbstractUnconstrainedSolution
+    0
+end
+
+function Metaheuristics.sum_violations(A::BLIndividual) 
+    vio_ul = A.ul isa Metaheuristics.AbstractUnconstrainedSolution ? 0 : Metaheuristics.sum_violations(A.ul)
+    vio_ll = A.ll isa Metaheuristics.AbstractUnconstrainedSolution ? 0 : Metaheuristics.sum_violations(A.ll)
+    # FIXME: Consider LL to compute this?
+    vio_ul + vio_ll
+end
 
 function Metaheuristics.is_feasible(A::BLIndividual)
     Metaheuristics.is_feasible(A.ul) && Metaheuristics.is_feasible(A.ll)

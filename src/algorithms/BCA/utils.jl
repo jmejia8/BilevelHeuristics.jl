@@ -1,4 +1,13 @@
 function is_better_bca(A::BLIndividual, B::BLIndividual)
+    A_vio = Metaheuristics.sum_violations(A)
+    B_vio = Metaheuristics.sum_violations(B)
+
+    if A_vio < B_vio
+        return true
+    elseif B_vio < A_vio
+        return false
+    end
+
     QxyA = leader_f(A) + follower_f(A)
     QxyB = leader_f(B) + follower_f(B)
 
