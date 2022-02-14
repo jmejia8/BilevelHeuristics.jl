@@ -1,5 +1,9 @@
 function gen_initial_state(status, problem::BLProblem,parameters,information,options)
-    N = parameters.N
+    if parameters isa Heuristic
+        N = parameters.ul.N
+    else
+        N = parameters.N
+    end 
 
     a = view(problem.ul.bounds, 1, :)'
     b = view(problem.ul.bounds, 2, :)'
