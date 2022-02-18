@@ -27,7 +27,7 @@ include("algorithms/SABO/SABO.jl")
 include("algorithms/BLEMO/BLEMO.jl")
 
 # framework
-include("algorithms/Heuristic.jl")
+include("algorithms/Heuristic/Heuristic.jl")
 
 
 end # module

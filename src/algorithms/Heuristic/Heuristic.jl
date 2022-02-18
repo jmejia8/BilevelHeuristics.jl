@@ -79,15 +79,17 @@ function update_state!(
     for i in 1:size(X,1)
         x = X[i,:]
         ll_sols = lower_level_optimizer(status,parameters,problem,information,options,x)
-
+        solutions = []
         for ll_sol in ll_sols
             sol = create_solution(x, ll_sol, problem) # sol = (x,y, Fxy,fxy,...)
-            push!(status.population, sol)
+            push!(solutions, sol)
             # save best solution found so far
             if is_better(sol, status.best_sol, parameters)
                 status.best_sol = sol
             end
         end
+        preferences = upper_level_decision_making(status, parameters, problem, information, options, solutions)
+        append!(status.population, solutions[preferences])
     end
 
     # delete solutions in status.population
@@ -197,15 +199,9 @@ function truncate_population!(
 end
 
 function reproduction(status, parameters,problem,information,options,args...;kargs...)
-    options.ul.debug && @warn "TODO reproduction(...)"
-    N = parameters.ul.N
-    D = size(problem.ul.bounds, 2)
-    a = problem.ul.bounds[1,:]'
-    b = problem.ul.bounds[2,:]'
-
-    X = a .+ (b .- a) .* rand(N, D)
-
-    return X
+    population_ul = get_ul_population(status.population)
+    s = Metaheuristics.State(status.best_sol.ul, population_ul)
+    Metaheuristics.reproduction(status_ul, parameters.ul, problem.ul)
 end
 
 

@@ -1,3 +1,6 @@
+include("upper_level_decision_making.jl")
+
+
 function gen_initial_state(status, problem::BLProblem,parameters,information,options)
     if parameters isa Heuristic
         N = parameters.ul.N
@@ -15,10 +18,14 @@ function gen_initial_state(status, problem::BLProblem,parameters,information,opt
     for i in 1:N
         x = X[i,:]
         ll_sols = lower_level_optimizer(status, parameters, problem, information, options, x)
+        solutions = []
         for ll_sol in ll_sols
-            push!(population_, create_solution(x, ll_sol, problem))
+            push!(solutions, create_solution(x, ll_sol, problem))
         end
+        decisions = upper_level_decision_making(status, parameters, problem, information, options, solutions)
+        append!(population_, solutions[decisions])
     end
+
     population = [s for s in population_]
 
     best_solution = Metaheuristics.get_best(population)
