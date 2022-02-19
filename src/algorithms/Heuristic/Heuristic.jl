@@ -14,6 +14,11 @@ mutable struct Heuristic <: AbstractParameters
     ll::AbstractParameters
 end
 
+include("lower_level.jl")
+include("multi_objective.jl")
+include("semi_vectorial.jl")
+include("single_objective.jl")
+
 function Heuristic(;ul::Metaheuristics.AbstractAlgorithm, ll::Metaheuristics.AbstractAlgorithm)
     parameters = Heuristic(ul.parameters, ll.parameters)
     # upper level configuration
@@ -96,107 +101,6 @@ function update_state!(
     truncate_population!(status, parameters,problem,information,options,args...;kargs...)
 end
 
-
-function lower_level_optimizer(
-        status,
-        parameters::Heuristic,
-        problem,
-        information,
-        options,
-        x,
-        initial_ll_sols = [],
-        args...;
-        kargs...
-    )
-
-    # lower level function parametrized by x
-    f_x(y) = Metaheuristics.evaluate(x, y, problem.ll)
-    
-    # changing seed is important
-    options.ll.seed = rand(UInt)
-    method = Metaheuristics.Algorithm(parameters.ll;
-                                      options=options.ll,
-                                      information=information.ll
-                                     )
-
-    if !isempty(initial_ll_sols)
-        Y = initial_ll_sols
-        @assert parameters.ll.N == size(Y,1)
-        population_ll = [Metaheuristics.create_child(y, f(Y[i,:])) for i in 1:size(Y,1)]
-        method.status = Metaheuristics.State(population_ll[1], population_ll)
-    end
-
-    res = Metaheuristics.optimize(f_x, problem.ll.bounds, method)
-
-    return lower_level_decision_making(status, parameters,problem,information,options,res,args...;kargs...)
-end
-
-# single-objective case
-function lower_level_decision_making(
-        status,
-        parameters::Heuristic,
-        problem,
-        information,
-        options,
-        results_ll::State,
-        args...;
-        kargs...
-    ) 
-
-    return handle_ll_multimodality(results_ll, problem, options) 
-end
-
-# multi-objective case
-function lower_level_decision_making(
-        status,
-        parameters::Heuristic,
-        problem,
-        information,
-        options,
-        results_ll::State{T},
-        args...;
-        kargs...
-    ) where T <: Metaheuristics.AbstractMultiObjectiveSolution
-
-    return results_ll.population
-end
-
-
-function truncate_population!(
-        status,
-        parameters::Heuristic,
-        problem,
-        information,
-        options
-    )
-
-    mask = sortperm(status.population, lt = (a, b) -> is_better(a,b, parameters))
-    N = parameters.ul.N
-    status.population = status.population[mask[1:N]]
-
-end
-
-function truncate_population!(
-        status::BLState{BLIndividual{U, L}},
-        parameters::Heuristic,
-        problem,
-        information,
-        options
-    ) where U <: Metaheuristics.AbstractMultiObjectiveSolution where L <: AbstractSolution
-
-    population_ul = get_ul_population(status.population)
-    Metaheuristics.environmental_selection!(population_ul, parameters.ul)
-
-    # TODO improve performance this part
-    mask = Int[]
-    for sol in get_ul_population(status.population)
-        i = findfirst( s -> s==sol, population_ul)
-        isnothing(i) && continue
-        push!(mask, i)
-    end
-
-    deleteat!(status.population, mask)    
-end
 
 function reproduction(status, parameters,problem,information,options,args...;kargs...)
     population_ul = get_ul_population(status.population)
