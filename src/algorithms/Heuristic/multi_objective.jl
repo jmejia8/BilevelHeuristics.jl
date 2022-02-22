@@ -1,4 +1,4 @@
-# multi-objective case
+# multi-objective LL case
 function lower_level_decision_making(
         status,
         parameters::Heuristic,
@@ -8,13 +8,13 @@ function lower_level_decision_making(
         results_ll::State{T},
         args...;
         kargs...
-    ) where T <: Metaheuristics.AbstractMultiObjectiveSolution
+    ) where T <: AbstractMultiObjectiveSolution
 
     return results_ll.population
 end
 
 function upper_level_decision_making(
-        status::BLState{BLIndividual{U, L}},
+        status::BLState{BLIndividual{T,T}},
         parameters,
         problem,
         information,
@@ -22,10 +22,27 @@ function upper_level_decision_making(
         solutions,
         args...;
         kargs...
-    ) where U <: Metaheuristics.AbstractMultiObjectiveSolution where L <: AbstractSolution
+    ) where T <: AbstractMultiObjectiveSolution
 
-    eachindex(solutions)
+    population_ul = get_ul_population(solutions)
+    Metaheuristics.get_non_dominated_solutions_perm(population_ul)
 end
+
+function upper_level_decision_making(
+        status::BLState{BLIndividual{U,L}},
+        parameters::Heuristic,
+        problem,
+        information,
+        options,
+        solutions,
+        args...;
+        kargs...
+    ) where U <: AbstractMultiObjectiveSolution where L <: AbstractSolution
+
+    population_ul = get_ul_population(solutions)
+    Metaheuristics.get_non_dominated_solutions_perm(population_ul)
+end
+
 
 function truncate_population!(
         status::BLState{BLIndividual{U, L}},
@@ -33,18 +50,20 @@ function truncate_population!(
         problem,
         information,
         options
-    ) where U <: Metaheuristics.AbstractMultiObjectiveSolution where L <: AbstractSolution
+    ) where U <: AbstractMultiObjectiveSolution where L <: AbstractSolution
+
+    length(status.population) <= parameters.ul.N && (return) 
 
     population_ul = get_ul_population(status.population)
     Metaheuristics.environmental_selection!(population_ul, parameters.ul)
 
     # TODO improve performance this part
-    mask = Int[]
+    delete_mask = ones(Bool, length(status.population))
     for sol in get_ul_population(status.population)
         i = findfirst( s -> s==sol, population_ul)
         isnothing(i) && continue
-        push!(mask, i)
+        delete_mask[i] = false
     end
 
-    deleteat!(status.population, mask)    
+    deleteat!(status.population, delete_mask)    
 end

@@ -105,7 +105,7 @@ end
 function reproduction(status, parameters,problem,information,options,args...;kargs...)
     population_ul = get_ul_population(status.population)
     s = Metaheuristics.State(status.best_sol.ul, population_ul)
-    Metaheuristics.reproduction(status_ul, parameters.ul, problem.ul)
+    Metaheuristics.reproduction(s, parameters.ul, problem.ul)
 end
 
 
