@@ -141,3 +141,9 @@ function Base.show(io::IO, status::BLState)
     @printf(io,"%12s %.4f s\n", "total time:", status.final_time - status.start_time)
     println(io, "+============================+")
 end
+
+function Base.show(io::IO, ::MIME"text/html", status::BLState)
+    println(io, "<pre>")
+    show(io, "text/plain", status)
+    println(io, "</pre>")
+end

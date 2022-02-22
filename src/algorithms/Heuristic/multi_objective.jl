@@ -29,7 +29,7 @@ function upper_level_decision_making(
 end
 
 function upper_level_decision_making(
-        status::BLState{BLIndividual{U,L}},
+        status::BLState{BLIndividual{U,Union{Metaheuristics.xf_indiv, Metaheuristics.xfgh_indiv}}},
         parameters::Heuristic,
         problem,
         information,
@@ -37,7 +37,7 @@ function upper_level_decision_making(
         solutions,
         args...;
         kargs...
-    ) where U <: AbstractMultiObjectiveSolution where L <: AbstractSolution
+    ) where U <: AbstractMultiObjectiveSolution # where L <: AbstractSolution
 
     population_ul = get_ul_population(solutions)
     Metaheuristics.get_non_dominated_solutions_perm(population_ul)
