@@ -11,7 +11,7 @@ function test_heuristic_SOBO()
     bounds_ul = bounds_ll = [-ones(3)'; ones(3)']
 
     # UL and LL optimizers and confs.
-    method_ul = DE(N=10;options=Options(f_calls_limit=100, debug=false, seed=1))
+    method_ul = ECA(N=10;options=Options(f_calls_limit=100, debug=false, seed=1))
     method_ll = DE(N=20;options=Options(f_calls_limit=1000))
     method = Heuristic(;ul=method_ul, ll=method_ll)
 
