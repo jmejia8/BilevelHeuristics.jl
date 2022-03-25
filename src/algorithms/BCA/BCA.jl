@@ -82,6 +82,7 @@ mutable struct BCA <: Metaheuristics.AbstractParameters
     K::Int
     η_max::Float64
     resize_population::Bool
+    N_init::Int
 end
 
 include("lower-level.jl")
@@ -94,7 +95,7 @@ function BCA(;N = 0, n=0, K = 7, η_max=2.0, resize_population = true,
         information_ll = Metaheuristics.Information()
     )
 
-    parameters = BCA(N, n,  K, η_max, resize_population)
+    parameters = BCA(N, n,  K, η_max, resize_population,N)
 
     Algorithm(
         parameters;
@@ -114,33 +115,37 @@ function initialize!(
         kargs...
     )
 
-    a = view(problem.ul.bounds, 1, :)'
-    b = view(problem.ul.bounds, 2, :)'
-    D = length(a)
+    D = size(problem.ul.bounds, 2)
     D_ll = size(problem.ll.bounds, 2)
+
+    parameters.K = max(parameters.K, 2)
+    K = parameters.K
 
     #### initialize budget and parameters
     if parameters.N == 0
-        parameters.N = parameters.K * D
+        parameters.N = clamp(K * D, K, 1000)
     end
 
     if parameters.n == 0
-        parameters.n = parameters.K * D_ll
+        parameters.n = clamp(K * D_ll, K, 1000)
     end
 
     if options.ul.f_calls_limit == 0
         options.ul.f_calls_limit = 500*D
         if options.ul.iterations == 0
-            options.ul.iterations = options.ul.f_calls_limit ÷ parameters.K
+            options.ul.iterations = options.ul.f_calls_limit ÷ K
         end
     end
 
     if options.ll.f_calls_limit == 0
         options.ll.f_calls_limit = 500*D_ll
         if options.ll.iterations == 0
-            options.ll.iterations = options.ll.f_calls_limit ÷ parameters.K
+            options.ll.iterations = options.ll.f_calls_limit ÷ K
         end
     end
+
+    # used for when `resize_population = true`
+    parameters.N_init = parameters.N
 
     status = gen_initial_state(status,problem,parameters,information,options)
     truncate_population!(status, parameters, problem, information, options, is_better_bca)
@@ -160,7 +165,6 @@ function update_state!(
 
     D = size(problem.ul.bounds, 2)
     I = randperm(parameters.N)
-    p = status.F_calls / options.ul.f_calls_limit
     K = parameters.K
     population = status.population
 
@@ -190,9 +194,17 @@ function update_state!(
         end
     end
 
-    parameters.N = round(Int, parameters.K*(D - (D-2)*p))
+    parameters.resize_population && update_population_size!(status, parameters, options)
     truncate_population!(status, parameters, problem, information, options, is_better_bca)
 end
+
+function update_population_size!(status, parameters::BCA, options) 
+    N_min = 2parameters.K
+    N_max = parameters.N_init
+    p = 1 - status.F_calls / options.ul.f_calls_limit
+    parameters.N = round(Int, N_min + (N_max - N_min)*p )
+end
+
 
 function stop_criteria!(status, parameters::BCA, problem, information, options)
     if !isnan(information.ul.f_optimum)

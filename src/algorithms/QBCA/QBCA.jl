@@ -159,7 +159,7 @@ function initialize!(
     population_ = []
 
     # only for initialization
-    bca = BCA(N, 3*D, 3, parameters.η_ul_max, resize_population)
+    bca = BCA(N, 3*D, 3, parameters.η_ul_max, resize_population,N)
 
     for i in 1:parameters.N
         x = X[i,:]

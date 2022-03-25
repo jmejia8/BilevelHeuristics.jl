@@ -18,15 +18,14 @@ function lower_level_optimizer(
     K = parameters.K
     η_max = parameters.η_max
     opts_ll = options.ll
+    opts_ll.seed = rand(UInt32)
     
     # lower level parameters
     method = Metaheuristics.ECA(;N, η_max, K,
-                                p_bin=0.0,
-                                p_exploit=2.0,
                                 resize_population = parameters.resize_population,
                                 options = opts_ll)
     # perform optimization
-    res = Metaheuristics.optimize( ff, problem.ll.bounds, method)
+    res = Metaheuristics.optimize(ff, problem.ll.bounds, method)
 
     ############# updated to handle multi-modal problems at lower level #################
     return handle_ll_multimodality(res, problem, options) 
