@@ -1,7 +1,7 @@
 module BilevelHeuristics
 
 export BCA, QBCA, QBCA2, SABO, optimize, minimum, minimizer
-export TestProblems, BLEMO
+export TestProblems, BLEMO, SMS_MOBO
 
 export get_ll_population, get_ul_population,ulvector,llvector,ulfval,llfval,ulpositions
 export ulpositions,llpositions,is_pseudo_feasible
@@ -28,6 +28,7 @@ include("algorithms/QBCA/QBCA.jl")
 include("algorithms/QBCA2/QBCA2.jl")
 include("algorithms/SABO/SABO.jl")
 include("algorithms/BLEMO/BLEMO.jl")
+include("algorithms/SMS_MOBO/SMS_MOBO.jl")
 
 # framework
 include("algorithms/Heuristic/Heuristic.jl")

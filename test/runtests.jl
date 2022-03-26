@@ -11,6 +11,7 @@ include("problems.jl")
 @testset "Algorithms" begin
     test_blemo()
     test_BCA()
+    test_sms_mobo()
 end
 
 @testset "Heuristic" begin

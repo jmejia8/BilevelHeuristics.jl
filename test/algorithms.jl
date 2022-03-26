@@ -73,3 +73,21 @@ function test_blemo()
     
 end
 
+function test_sms_mobo()
+    fnum = 1
+    F, f, bounds_ul, bounds_ll, Ψ, UL_sols = TestProblems.TP.get_problem(fnum)
+
+    options_ul = Options(iterations = 2, debug = false, seed=1)
+    options_ll = Options(iterations = 40)
+
+
+    method = SMS_MOBO(;options_ul, options_ll)
+    r = optimize(F, f, bounds_ul, bounds_ll, method)
+    
+    A_ul = map(s -> s[1], method.parameters.archive)
+
+    @test length(A_ul) > 0
+
+    
+end
+
