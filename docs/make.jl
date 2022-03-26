@@ -12,6 +12,7 @@ makedocs(
          pages = [
                   "Index" => "index.md",
                   "Algorithms" => "algorithms.md",
+                  "Examples" => "examples.md",
                   "API References" => "api.md",
                  ]
         )

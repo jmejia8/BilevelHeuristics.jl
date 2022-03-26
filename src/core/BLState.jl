@@ -132,8 +132,6 @@ function Base.show(io::IO, status::BLState)
 
     show_optim_info(io, status)
 
-
-
     @printf(io,"%12s %.0f\n", "F calls:", status.F_calls)
     @printf(io,"%12s %.0f\n", "f calls:", status.f_calls)
     @printf(io,"%12s ", "Message:")

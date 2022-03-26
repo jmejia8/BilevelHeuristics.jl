@@ -65,6 +65,10 @@ function test_blemo()
     A_ul = map(s -> s[1], method.parameters.archive)
 
     @test length(A_ul) > 0
+    @test ulgvals(r.population) isa AbstractMatrix
+    @test ulhvals(r.population) isa AbstractMatrix
+    @test llgvals(r.population) isa AbstractMatrix
+    @test llhvals(r.population) isa AbstractMatrix
 
     
 end

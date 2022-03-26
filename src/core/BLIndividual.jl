@@ -79,6 +79,49 @@ Get lower-level decision vectors from population.
 llpositions(pop::Vector) = Metaheuristics.positions(get_ll_population(pop))
 
 """
+    ulfvals(pop)
+
+Get upper-level function values from population.
+"""
+ulfvals(pop::AbstractVector) = Metaheuristics.fvals(get_ul_population(pop))
+
+"""
+    llfvals(pop)
+
+Get lower-level function values from population.
+"""
+llfvals(pop::AbstractVector) = Metaheuristics.fvals(get_ll_population(pop))
+
+
+"""
+    ulgvals(pop)
+
+Get upper-level inequality constraints.
+"""
+ulgvals(pop::AbstractVector) = Metaheuristics.gvals(get_ul_population(pop))
+
+"""
+    llgvals(pop)
+
+Get lower-level inequality constraints.
+"""
+llgvals(pop::AbstractVector) = Metaheuristics.gvals(get_ll_population(pop))
+
+"""
+    ulhvals(pop)
+
+Get upper-level equality constraints.
+"""
+ulhvals(pop::AbstractVector) = Metaheuristics.hvals(get_ul_population(pop))
+
+"""
+    llhvals(pop)
+
+Get lower-level equality constraints.
+"""
+llhvals(pop::AbstractVector) = Metaheuristics.hvals(get_ll_population(pop))
+
+"""
     is_pseudo_feasible(A, B, δ1, δ2, ε1, ε2)
 
 Check whether `A` is a pseudo-feasible solution respect to `B`.

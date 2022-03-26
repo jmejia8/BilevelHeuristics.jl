@@ -1,0 +1,76 @@
+# Examples
+
+Here, some examples are presented to illustrate some study cases.
+
+## Constrained Problems
+
+Here, equality and inequality constraints are defined as:
+
+Constraints at upper-level:
+
+$G_i(x,y) \leq 0, \ i = 1,2,\ldots,I$
+$H_j(x,y) = 0, \ j = 1,2,\ldots,J$
+
+
+Constraints at lower-level:
+
+$g_k(x,y) \leq 0, \ i = 1,2,\ldots,K$
+$h_l(x,y) = 0, \ j = 1,2,\ldots,L$
+
+### Implementation
+
+Upper level problem: `F(x,y)` with `x` as the upper-level vector.
+
+```julia-repl
+julia> function F(x, y)
+  Fxy = sum(x.^2) + sum(y.^2)
+  Gxy = [ x[1] + x[2] - 1,  x[3] - x[3] - 10]
+  Hxy = [0.0]
+  return Fxy, Gxy, Hxy
+end
+F (generic function with 1 method)
+
+julia> bounds_ul = [-ones(5) ones(5)];
+
+```
+
+Lower level problem: `f(x, y)` with `y` as the lower-level vector.
+
+```julia-repl
+julia> function f(x, y) 
+  fxy = sum((x - y).^2) + y[1]^2
+  gxy = [x[2] - y[1]^2 - 5]
+  hxy = [0.0]
+  fxy, gxy, hxy
+end
+f (generic function with 1 method)
+
+julia> bounds_ll = [-ones(5) ones(5)];
+
+```
+
+Approximate solution.
+
+```julia-repl
+julia> res = optimize(F, f, bounds_ul, bounds_ll, BCA())
++=========== RESULT ==========+
+  iteration: 108
+    minimum: 
+          F: 4.08164e-10
+          f: 3.49457e-10
+  minimizer: 
+          x: [1.821445118847534e-6, 9.431162141567291e-6, 5.039441103662204e-6, 1.2440713582037751e-5, -9.430574843388418e-6]
+          y: [5.173759982237097e-6, -1.6496788937326975e-6, -1.591480747137886e-6, 2.1659898236762077e-6, -3.175376796124624e-6]
+    F calls: 2503
+    f calls: 5123090
+    Message: Stopped due UL function evaluations limitations. 
+ total time: 32.3749 s
++============================+
+
+
+julia> res.best_sol
+Upper-level:
+(f = 4.0816e-10, g = [-0.9999887473927396, -10.0], h = [0.0], x = [1.821e-06, 9.431e-06, …, -9.431e-06])
+Lower-level:
+(f = 3.4946e-10, g = [-4.999990568864626], h = [0.0], x = [5.174e-06, -1.650e-06, …, -3.175e-06])
+```
