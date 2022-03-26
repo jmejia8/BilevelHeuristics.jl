@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Examples · BilevelHeuristics.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">BilevelHeuristics.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Index</a></li><li><a class="tocitem" href="../algorithms/">Algorithms</a></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Constrained-Bilevel-Optimization"><span>Constrained Bilevel Optimization</span></a></li><li><a class="tocitem" href="#Multi-objective-Bilevel-Optimization"><span>Multi-objective Bilevel Optimization</span></a></li></ul></li><li><a class="tocitem" href="../api/">API References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jmejia8/BilevelHeuristics.jl/blob/master/docs/src/examples.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h1><p>Here, some examples are presented to illustrate some study cases in bilevel optimization.</p><h2 id="Constrained-Bilevel-Optimization"><a class="docs-heading-anchor" href="#Constrained-Bilevel-Optimization">Constrained Bilevel Optimization</a><a id="Constrained-Bilevel-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Constrained-Bilevel-Optimization" title="Permalink"></a></h2><p>Assume you want to solve the following optimization problem.</p><p>Minimize:</p><p class="math-container">\[F(x,y) = \sum_{i=1}^D x_i^2 + \sum_{j=1}^D y_j^2, \ x \in X\]</p><p>Subject to:</p><p class="math-container">\[y\in \arg\min_{y\in Y} \left\{ f(x,y) = \sum_{i=1}^D (x - y)^2 + y_1^2: g(x,y) = x_2 - y_1 - 5 \leq 0 \right\}\]</p><p class="math-container">\[G_1(x,y) = x_1 + x_2  \leq 1\]</p><p class="math-container">\[G_2(x,y) = x_3 - y_3 \leq 10\]</p><p class="math-container">\[X = [-5, 5]^5,\ Y = [-5, 5]^5\]</p><p>Constraints should be defined follows.</p><p>Constraints at upper-level:</p><p class="math-container">\[G_i(x,y) \leq 0, \ i = 1,2,\ldots,I\]</p><p class="math-container">\[H_j(x,y) = 0, \ j = 1,2,\ldots,J\]</p><p>Constraints at lower-level:</p><p class="math-container">\[g_k(x,y) \leq 0, \ i = 1,2,\ldots,K\]</p><p class="math-container">\[h_l(x,y) = 0, \ j = 1,2,\ldots,L\]</p><p>See this example on  <a href="https://jmejia8.github.io/Metaheuristics.jl/stable/examples/#Constrained-Optimization">constrained optimization with Metaheurstics.jl</a> for more details.</p><h3 id="Implementation"><a class="docs-heading-anchor" href="#Implementation">Implementation</a><a id="Implementation-1"></a><a class="docs-heading-anchor-permalink" href="#Implementation" title="Permalink"></a></h3><p>Upper level problem: <code>F(x,y)</code> with <code>x</code> as the upper-level vector.</p><pre><code class="language-julia-repl">julia&gt; function F(x, y)
+  Fxy = sum(x.^2) + sum(y.^2)
+  Gxy = [ x[1] + x[2] - 1,  x[3] - y[3] - 10]
+  Hxy = [0.0]
+  return Fxy, Gxy, Hxy
+end
+F (generic function with 1 method)
+
+julia&gt; bounds_ul = [-ones(5) ones(5)];
+</code></pre><p>Lower level problem: <code>f(x, y)</code> with <code>y</code> as the lower-level vector.</p><pre><code class="language-julia-repl">julia&gt; function f(x, y) 
+  fxy = sum((x - y).^2) + y[1]^2
+  gxy = [x[2] - y[1]^2 - 5]
+  hxy = [0.0]
+  fxy, gxy, hxy
+end
+f (generic function with 1 method)
+
+julia&gt; bounds_ll = [-ones(5) ones(5)];
+</code></pre><p>Approximate solution.</p><pre><code class="language-julia-repl">julia&gt; res = optimize(F, f, bounds_ul, bounds_ll, BCA())
++=========== RESULT ==========+
+  iteration: 108
+    minimum: 
+          F: 4.08164e-10
+          f: 3.49457e-10
+  minimizer: 
+          x: [1.821445118847534e-6, 9.431162141567291e-6, 5.039441103662204e-6, 1.2440713582037751e-5, -9.430574843388418e-6]
+          y: [5.173759982237097e-6, -1.6496788937326975e-6, -1.591480747137886e-6, 2.1659898236762077e-6, -3.175376796124624e-6]
+    F calls: 2503
+    f calls: 5123090
+    Message: Stopped due UL function evaluations limitations. 
+ total time: 32.3749 s
++============================+
+
+
+julia&gt; res.best_sol
+Upper-level:
+(f = 4.0816e-10, g = [-0.9999887473927396, -10.0], h = [0.0], x = [1.821e-06, 9.431e-06, …, -9.431e-06])
+Lower-level:
+(f = 3.4946e-10, g = [-4.999990568864626], h = [0.0], x = [5.174e-06, -1.650e-06, …, -3.175e-06])</code></pre><h2 id="Multi-objective-Bilevel-Optimization"><a class="docs-heading-anchor" href="#Multi-objective-Bilevel-Optimization">Multi-objective Bilevel Optimization</a><a id="Multi-objective-Bilevel-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Multi-objective-Bilevel-Optimization" title="Permalink"></a></h2><p>This example illustrates how a multi-objective bilevel problem can be solved.</p><pre><code class="language-julia-repl">julia&gt; using BilevelHeuristics
+
+julia&gt; function F(x, y) # upper level
+           [y[1] - x[1], y[2]], [-1.0 - sum(y)], [0.0]
+       end
+F (generic function with 1 method)
+
+julia&gt; function f(x, y) # lower level
+           y, [-x[1]^2 + sum(y .^ 2)], [0.0]
+       end
+f (generic function with 1 method)
+
+julia&gt; bounds_ul = Array([0.0 1]&#39;) # upper level bounds for x
+2×1 Matrix{Float64}:
+ 0.0
+ 1.0
+
+julia&gt; bounds_ll = [-1 -1; 1 1.0] # lower level bounds for y
+2×2 Matrix{Float64}:
+ -1.0  -1.0
+  1.0   1.0
+
+julia&gt; method = SMS_MOBO()
+SMS_MOBO{NSGA2}(SMS_EMOA(N=100, η_cr=20.0, p_cr=0.9, η_m=20.0, p_m=-1.0, n_samples=10000), NSGA2(N=50, η_cr=20.0, p_cr=0.9, η_m=20.0, p_m=-1.0), 10, Any[])
+
+julia&gt; res = optimize(F, f, bounds_ul, bounds_ll, method)
++=========== RESULT ==========+
+  iteration: 100
+population:
+         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀F space⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+         ┌────────────────────────────────────────┐ 
+       1 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+   f₂    │⠦⢤⣤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤│ 
+         │⠀⠀⠈⠙⠒⠄⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠈⠙⠲⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢆⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+      -1 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         └────────────────────────────────────────┘ 
+         ⠀-2⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀0⠀ 
+         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀f₁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+non-dominated solution(s):
+         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀F space⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+         ┌────────────────────────────────────────┐ 
+       1 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+   f₂    │⠦⢤⣤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤│ 
+         │⠀⠀⠈⠙⠒⠄⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠈⠙⠲⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢆⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+      -1 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         └────────────────────────────────────────┘ 
+         ⠀-2⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀0⠀ 
+         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀f₁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+    F calls: 54500
+    f calls: 2725000
+    Message: Stopped due completed iterations. 
+ total time: 22.1997 s
++============================+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../algorithms/">« Algorithms</a><a class="docs-footer-nextpage" href="../api/">API References »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 26 March 2022 20:54">Saturday 26 March 2022</span>. Using Julia version 1.6.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
