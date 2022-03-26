@@ -4,7 +4,20 @@ Here, some examples are presented to illustrate some study cases.
 
 ## Constrained Problems
 
-Here, equality and inequality constraints are defined as:
+Assume you want to solve the following optimization problem.
+
+Minimize:
+
+$F(x,y) = \sum_{i=1}^D x_i^2 + \sum_{j=1}^D y_j^2, \ x \in X$
+
+Subject to:
+
+$y\in \arg\min_{y\in Y} \left\{ f(x,y) = \sum_{i=1}^D (x - y)^2 + y_1^2: g(x,y) = x_2 - y_1 - 5 \leq 0 \right\}$
+$G_1(x,y) = x_1 + x_2  \leq 1$
+$G_2(x,y) = x_3 - y_3 \leq 10$
+$X = [-5, 5]^5,\ Y = [-5, 5]^5$
+
+Constraints should be defined follows.
 
 Constraints at upper-level:
 
@@ -17,6 +30,9 @@ Constraints at lower-level:
 $g_k(x,y) \leq 0, \ i = 1,2,\ldots,K$
 $h_l(x,y) = 0, \ j = 1,2,\ldots,L$
 
+See this example on  [constrained optimization with Metaheurstics.jl](https://jmejia8.github.io/Metaheuristics.jl/stable/examples/#Constrained-Optimization)
+for more details.
+
 ### Implementation
 
 Upper level problem: `F(x,y)` with `x` as the upper-level vector.
@@ -24,7 +40,7 @@ Upper level problem: `F(x,y)` with `x` as the upper-level vector.
 ```julia-repl
 julia> function F(x, y)
   Fxy = sum(x.^2) + sum(y.^2)
-  Gxy = [ x[1] + x[2] - 1,  x[3] - x[3] - 10]
+  Gxy = [ x[1] + x[2] - 1,  x[3] - y[3] - 10]
   Hxy = [0.0]
   return Fxy, Gxy, Hxy
 end
