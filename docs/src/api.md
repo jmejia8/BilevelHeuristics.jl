@@ -42,6 +42,36 @@ llfval
 
 
 ```@docs
+ulfvals
+```
+
+
+```@docs
+llfvals
+```
+
+
+```@docs
+ulgvals
+```
+
+
+```@docs
+llgvals
+```
+
+
+```@docs
+ulhvals
+```
+
+
+```@docs
+llhvals
+```
+
+
+```@docs
 ulpositions
 ```
 
@@ -54,3 +84,4 @@ llpositions
 ```@docs
 is_pseudo_feasible
 ```
+
