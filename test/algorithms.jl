@@ -21,7 +21,7 @@ function test_BCA()
     D_ul = size(bounds_ul, 2)
     D_ll = size(bounds_ll, 2)
 
-    options_ul = Options(f_tol = 1e-2, iterations = 2, debug = false, seed=1)
+    options_ul = Options(f_tol = 1e-2, iterations = 2, time_limit=3.1, debug = false, seed=1)
     options_ll = Options(f_tol = 1e-3)
 
     information_ul = Information(f_optimum = 0.0)

@@ -38,7 +38,7 @@ function test_heuristic_SVBO()
     bounds_ul = bounds_ll = [-ones(3)'; ones(3)']
 
     # UL and LL optimizers and confs.
-    method_ul = DE(N=10;options=Options(f_calls_limit=100, debug=false, seed=1))
+    method_ul = DE(N=10;options=Options(f_calls_limit=10000, iterations=1000, time_limit=2.5, debug=false, seed=1))
     method_ll = NSGA2(N=20;options=Options(f_calls_limit=1000))
     method = Heuristic(;ul=method_ul, ll=method_ll)
 
