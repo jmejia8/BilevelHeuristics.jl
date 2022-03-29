@@ -28,11 +28,13 @@ function gen_optimal(x, problem, parameters, options)
 
     D = size(bounds, 2)
 
+    options.ll.seed = rand(UInt) # this is important
+
     f_calls_limit = options.ll.f_calls_limit
     if parameters.use_surrogate_model
-        eca = SECA(K=7, N = 7*D, λ=parameters.λ)
+        eca = SECA(K=7, N = 7*D, λ=parameters.λ,options=options.ll)
     else
-        eca = Metaheuristics.ECA(K=7, N = 7*D)
+        eca = Metaheuristics.ECA(K=7, N = 7*D, options=options.ll)
     end
     
 
