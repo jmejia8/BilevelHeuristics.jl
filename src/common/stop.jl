@@ -19,6 +19,15 @@ function iteration_stop_check(status, information, options)
 end
 
 
+function time_stop_check(status, information, options)
+    cond =  status.overall_time >= options.ul.time_limit
+    if cond
+        status.stop_msg *= "Stopped since time limit was met. "
+    end
+    
+    cond
+end
+
 function accuracy_stop_check(status, information, options)
     F_opt = information.ul.f_optimum
     f_opt = information.ll.f_optimum
