@@ -4,9 +4,16 @@ using Test
 import Random: seed!
 seed!(1)
 
+include("DBMA.jl")
 include("heuristic.jl")
 include("algorithms.jl")
 include("problems.jl")
+
+@testset "DBMA" begin
+    test_dbma_MOBO()
+end
+
+
 
 @testset "Algorithms" begin
     test_blemo()
@@ -25,3 +32,5 @@ end
     test_problems()
     test_ds_problems()
 end
+
+
