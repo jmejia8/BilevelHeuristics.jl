@@ -1,7 +1,9 @@
-"""
-    Heuristic(ul, ll)
+abstract type AbstractNested <: AbstractParameters end
 
-Heuristic is a framework that uses nested scheme to solve bilevel problem. You only need
+"""
+    Nested(ul, ll)
+
+Nested is a framework that uses nested scheme to solve bilevel problem. You only need
 to provide:
 
 - `ul` an upper-level optimizer
@@ -9,18 +11,20 @@ to provide:
 
 with their configuration.
 """
-mutable struct Heuristic <: AbstractParameters
+mutable struct Nested <: AbstractNested
     ul::AbstractParameters
     ll::AbstractParameters
 end
+
+const Heuristic = Nested
 
 include("lower_level.jl")
 include("multi_objective.jl")
 include("semi_vectorial.jl")
 include("single_objective.jl")
 
-function Heuristic(;ul::Metaheuristics.AbstractAlgorithm, ll::Metaheuristics.AbstractAlgorithm)
-    parameters = Heuristic(ul.parameters, ll.parameters)
+function Nested(;ul::Metaheuristics.AbstractAlgorithm, ll::Metaheuristics.AbstractAlgorithm)
+    parameters = Nested(ul.parameters, ll.parameters)
     # upper level configuration
     options_ul = ul.options
     information_ul = ul.information
@@ -38,7 +42,7 @@ end
 
 function initialize!(
         status,
-        parameters::Heuristic,
+        parameters::AbstractNested,
         problem,
         information,
         options,
@@ -70,7 +74,7 @@ end
 
 function update_state!(
         status,
-        parameters::Heuristic,
+        parameters::AbstractNested,
         problem,
         information,
         options,
@@ -109,12 +113,12 @@ function reproduction(status, parameters,problem,information,options,args...;kar
 end
 
 
-function stop_criteria!(status, parameters::Heuristic, problem, information, options)
+function stop_criteria!(status, parameters::AbstractNested, problem, information, options)
     return
 end
 
-function final_stage!(status, parameters::Heuristic, problem, information, options)
+function final_stage!(status, parameters::AbstractNested, problem, information, options)
     return
 end
 
-is_better(A, B, parameters::Heuristic) = Metaheuristics.is_better(A, B)
+is_better(A, B, parameters::AbstractNested) = Metaheuristics.is_better(A, B)

@@ -2,7 +2,7 @@ include("upper_level_decision_making.jl")
 
 
 function gen_initial_state(status, problem::BLProblem,parameters,information,options)
-    if parameters isa Heuristic
+    if typeof(parameters) <: AbstractNested
         N = parameters.ul.N
     else
         N = parameters.N

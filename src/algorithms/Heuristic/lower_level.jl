@@ -1,7 +1,7 @@
 # single-objective case
 function lower_level_decision_making(
         status,
-        parameters::Heuristic,
+        parameters::AbstractNested,
         problem,
         information,
         options,
@@ -15,7 +15,7 @@ end
 
 function lower_level_optimizer(
         status,
-        parameters::Heuristic,
+        parameters::AbstractNested,
         problem,
         information,
         options,

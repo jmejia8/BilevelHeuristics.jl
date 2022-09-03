@@ -1,6 +1,6 @@
 function truncate_population!(
         status,
-        parameters::Heuristic,
+        parameters::AbstractNested,
         problem,
         information,
         options

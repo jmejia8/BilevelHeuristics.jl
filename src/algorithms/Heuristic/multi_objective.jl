@@ -1,7 +1,7 @@
 # multi-objective LL case
 function lower_level_decision_making(
         status,
-        parameters::Heuristic,
+        parameters::AbstractNested,
         problem,
         information,
         options,
@@ -30,7 +30,7 @@ end
 
 function upper_level_decision_making(
         status::BLState{BLIndividual{U,Union{Metaheuristics.xf_indiv, Metaheuristics.xfgh_indiv}}},
-        parameters::Heuristic,
+        parameters::AbstractNested,
         problem,
         information,
         options,
@@ -46,7 +46,7 @@ end
 
 function truncate_population!(
         status::BLState{BLIndividual{U, L}},
-        parameters::Heuristic,
+        parameters::AbstractNested,
         problem,
         information,
         options

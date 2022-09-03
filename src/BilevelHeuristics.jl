@@ -8,6 +8,7 @@ export ulpositions,llpositions,is_pseudo_feasible
 export ulfvals, ulgvals, ulhvals, llfvals, llgvals, llhvals
 export BLState, BLOptions, BLInformation
 export Heuristic
+export DBMA
 
 
 # import dependencies
@@ -32,6 +33,7 @@ include("algorithms/SMS_MOBO/SMS_MOBO.jl")
 
 # framework
 include("algorithms/Heuristic/Heuristic.jl")
+include("algorithms/DBMA/DBMA.jl")
 
 
 end # module
