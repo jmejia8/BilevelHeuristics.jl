@@ -1,4 +1,4 @@
-struct DBMA_LL <: Metaheuristics.AbstractParameters
+mutable struct DBMA_LL <: Metaheuristics.AbstractParameters
     parameters::DE
     environmental_selection::NSGA2
 end
@@ -11,17 +11,18 @@ function lower_level_optimizer(
         information,
         options,
         x,
+        initial_ll_sols = [],
         args...;
         kargs...
     )
 
-    parameters = blparameters.ll
+    de = blparameters.ll
 
     # lower level function parametrized by x
     f_x(y) = Metaheuristics.evaluate(x, y, problem.ll)
 
-    nsga2 = NSGA2(N=parameters.N).parameters
-    parms = DBMA_LL(parameters, nsga2)
+    nsga2 = NSGA2(N=de.N).parameters
+    parms = DBMA_LL(de, nsga2)
     ll_method = Metaheuristics.Algorithm(parms;
                                          options=options.ll,
                                          information=information.ll
@@ -60,7 +61,7 @@ end
 
 initialize!(status,alg::DBMA_LL,args...;kargs...) = initialize!(status,alg.parameters,args...;kargs...)
 
-final_stage!(status,alg::DBMA_LL,args...;kargs...) = initialize!(status,alg.parameters,args...;kargs...)
+final_stage!(status,alg::DBMA_LL,args...;kargs...) = final_stage!(status,alg.parameters,args...;kargs...)
 
 
 
