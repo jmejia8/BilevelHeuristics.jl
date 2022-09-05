@@ -50,7 +50,12 @@ function fast_non_dominated_sort!(pop, parameters::DBMA_LL)
         k += one(UInt16)
     end
 
-    return rank
+    for (i, s) in enumerate(pop)
+        s.rank = rank[i]
+    end
+
+    sort!(pop, by = s -> s.rank)
+
 end
 
 
@@ -60,7 +65,8 @@ initialize!(status,alg::DBMA_LL,problem::Metaheuristics.AbstractProblem, informa
 final_stage!(status,alg::DBMA_LL,problem::Metaheuristics.AbstractProblem, information::Information, options::Options, args...; kargs...) = final_stage!(status,alg.parameters, problem, information, options,args...;kargs...)
 
 
-function update_state!(status,
+function update_state!(
+        status,
         _parameters::DBMA_LL,
         problem::Metaheuristics.AbstractProblem,
         information::Information,
