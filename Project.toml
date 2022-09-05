@@ -19,7 +19,7 @@ UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 [compat]
 LineSearches = "7.1.1"
 MLKernels = "0.4.0"
-Metaheuristics = "3.2.9"
+Metaheuristics = "^3.2.11"
 Optim = "1.6.1"
 Reexport = "1.2.2"
 UnicodePlots = "2.6.0"
