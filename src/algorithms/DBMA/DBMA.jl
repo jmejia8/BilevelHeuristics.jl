@@ -1,6 +1,6 @@
 mutable struct DBMA <: AbstractNested
     ul::DE
-    ll::DE
+    ll::εDE
 end
 
 include("lower_level.jl")
@@ -17,7 +17,7 @@ function DBMA(;
     )
 
     de_ul = DE(;N = Nu, F, CR)
-    de_ll = DE(;N = Nl, F, CR)
+    de_ll = εDE(;N = Nl, F, CR)
 
     parameters = DBMA(de_ul.parameters, de_ll.parameters)
 
