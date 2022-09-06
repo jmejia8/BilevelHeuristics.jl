@@ -436,9 +436,9 @@ function leader(p::DS5, x, y)
     F1 = (1 - y[1])*(1 + sum( y[2:k].^2 ))*x[1]
     F2 = (y[1])*(1  + sum( y[2:k].^2 ))*x[1]
     # the following constraint seems to be wrong in paper
-    G1 = ( (1 - y[1])*x[1] + 0.5y[1]*x[1] - 2 + (1/5)*floor(5*(1-y[1])*x[1] + 0.2 )  )
+    G1 =  -(1 - y[1])*x[1] - 0.5y[1]*x[1] + 2 - (0.2)*floor(5*(1-y[1])*x[1] + 0.2 )
     
-    return [F1, F2], [-G1], constraint
+    return [F1, F2], [G1], constraint
 end
 
 function follower(p::DS5, x, y)
