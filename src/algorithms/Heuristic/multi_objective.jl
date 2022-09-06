@@ -59,10 +59,10 @@ function truncate_population!(
 
     # TODO improve performance this part
     delete_mask = ones(Bool, length(status.population))
-    for sol in get_ul_population(status.population)
+    for (j, sol) in enumerate(get_ul_population(status.population))
         i = findfirst( s -> s==sol, population_ul)
         isnothing(i) && continue
-        delete_mask[i] = false
+        delete_mask[j] = false
     end
 
     deleteat!(status.population, delete_mask)    
