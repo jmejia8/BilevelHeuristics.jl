@@ -61,7 +61,8 @@ function _ϵ_control!(status, blparameters::DBMA, bloptions)
     parameters.ε_0 = Metaheuristics.sum_violations(s)
     parameters.Tc = round(Int, 0.2*options.iterations)
     parameters.N = parameters.de.N
-    parameters.ε = Metaheuristics.ε_level_control_function(ε_0, t, Tc, cp)
+    p = parameters
+    parameters.ε = Metaheuristics.ε_level_control_function(p.ε_0, t, p.Tc, p.cp)
 
 end
 
@@ -82,13 +83,14 @@ function truncate_population!(
 
     dde = DBMA_LL(parameters.ul)
     Metaheuristics.environmental_selection!(population_ul, dde)
+ 
 
     # TODO improve performance this part
     delete_mask = ones(Bool, length(status.population))
-    for sol in get_ul_population(status.population)
+    for (j, sol) in enumerate(get_ul_population(status.population))
         i = findfirst( s -> s==sol, population_ul)
         isnothing(i) && continue
-        delete_mask[i] = false
+        delete_mask[j] = false
     end
 
     deleteat!(status.population, delete_mask)    
