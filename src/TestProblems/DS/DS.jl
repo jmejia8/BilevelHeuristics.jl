@@ -526,7 +526,7 @@ function get_problem(fnum::Int)
     elseif fnum == 4
         return get_problem(DS4())
     elseif fnum == 5
-        @warn "This probem implementation (DS5) differs from original paper."
+        # @warn "This probem implementation (DS5) differs from original paper."
         return get_problem(DS5())
     else
         error("DS$fnum not implemented.")
