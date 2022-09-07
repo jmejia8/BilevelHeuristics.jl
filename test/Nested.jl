@@ -2,7 +2,7 @@
 # SVBO = semi_vectorial bilevel optimization
 # MOBO = multi-objective bilvel optimization
 
-function test_heuristic_SOBO()
+function test_nested_SOBO()
     # objective functions
     F(x, y) = sum(x.^2) - y[end].^2
     f(x, y) = sum((x[1:end-1]-y[1:end-1]).^2) + y[end].^2
@@ -13,7 +13,7 @@ function test_heuristic_SOBO()
     # UL and LL optimizers and confs.
     method_ul = ECA(N=10;options=Options(f_calls_limit=100, debug=false, seed=1))
     method_ll = DE(N=20;options=Options(f_calls_limit=1000))
-    method = Heuristic(;ul=method_ul, ll=method_ll)
+    method = Nested(;ul=method_ul, ll=method_ll)
 
     # optimize
     res = optimize(F, f, bounds_ul, bounds_ll, method)
@@ -24,7 +24,7 @@ function test_heuristic_SOBO()
     @test !isnan(Fxy) && !isnan(fxy)
 end
 
-function test_heuristic_SVBO()
+function test_nested_SVBO()
     # objective functions
     F(x, y) = (x[1] - 0.5)^2 + sum(x[2:end].^2) + y[1].^2
     f(x, y) = begin
@@ -40,7 +40,7 @@ function test_heuristic_SVBO()
     # UL and LL optimizers and confs.
     method_ul = DE(N=10;options=Options(f_calls_limit=10000, iterations=1000, time_limit=2.5, debug=false, seed=1))
     method_ll = NSGA2(N=20;options=Options(f_calls_limit=1000))
-    method = Heuristic(;ul=method_ul, ll=method_ll)
+    method = Nested(;ul=method_ul, ll=method_ll)
 
     # optimize
     res = optimize(F, f, bounds_ul, bounds_ll, method)
@@ -50,7 +50,7 @@ function test_heuristic_SVBO()
     @test !isnan(Fxy) && !any(isnan.(fxy))
 end
 
-function test_heuristic_MOBO()
+function test_nested_MOBO()
     # objective functions
     F(x, y) = begin
         Fx = [x[1]^2, (1-x[1])^2] .+ sum(x[2:end].^2) .+ y[1].^2
@@ -72,7 +72,7 @@ function test_heuristic_MOBO()
     # UL and LL optimizers and confs.
     method_ul = NSGA2(N=10;options=Options(f_calls_limit=100, debug=false,seed=1))
     method_ll = NSGA2(N=20;options=Options(f_calls_limit=1000))
-    method = Heuristic(;ul=method_ul, ll=method_ll)
+    method = Nested(;ul=method_ul, ll=method_ll)
 
     # optimize
     res = optimize(F, f, bounds_ul, bounds_ll, method)
@@ -83,7 +83,7 @@ function test_heuristic_MOBO()
 end
 
 # MOBO with single objective lower level
-function test_heuristic_MOBO2()
+function test_nested_MOBO2()
     # objective functions
     F(x, y) = begin
         Fx = [x[1]^2, (1-x[1])^2] .+ sum(x[2:end].^2) .+ 2y[end].^2
@@ -100,7 +100,7 @@ function test_heuristic_MOBO2()
     # UL and LL optimizers and confs.
     method_ul = NSGA2(N=20;options=Options(f_calls_limit=1000,iterations=3, seed=1))
     method_ll = DE(N=20;options=Options(f_calls_limit=1000))
-    method = Heuristic(;ul=method_ul, ll=method_ll)
+    method = Nested(;ul=method_ul, ll=method_ll)
 
     # optimize
     res = optimize(F, f, bounds_ul, bounds_ll, method)

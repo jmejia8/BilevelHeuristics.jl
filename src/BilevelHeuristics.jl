@@ -7,7 +7,7 @@ export get_ll_population, get_ul_population,ulvector,llvector,ulfval,llfval,ulpo
 export ulpositions,llpositions,is_pseudo_feasible
 export ulfvals, ulgvals, ulhvals, llfvals, llgvals, llhvals
 export BLState, BLOptions, BLInformation
-export Heuristic
+export Nested
 export DBMA
 
 
@@ -32,8 +32,12 @@ include("algorithms/BLEMO/BLEMO.jl")
 include("algorithms/SMS_MOBO/SMS_MOBO.jl")
 
 # framework
-include("algorithms/Heuristic/Heuristic.jl")
+include("algorithms/Nested/Nested.jl")
 include("algorithms/DBMA/DBMA.jl")
+
+# deprecations
+@deprecate Heuristic Nested
+@deprecate Heuristic(;kargs...) Nested(;kargs...)
 
 
 end # module

@@ -5,7 +5,7 @@ import Random: seed!
 seed!(1)
 
 include("DBMA.jl")
-include("heuristic.jl")
+include("Nested.jl")
 include("algorithms.jl")
 include("problems.jl")
 
@@ -21,11 +21,11 @@ end
     test_sms_mobo()
 end
 
-@testset "Heuristic" begin
-    test_heuristic_MOBO2()
-    test_heuristic_MOBO()
-    test_heuristic_SVBO()
-    test_heuristic_SOBO()
+@testset "Nested" begin
+    test_nested_MOBO2()
+    test_nested_MOBO()
+    test_nested_SVBO()
+    test_nested_SOBO()
 end
 
 @testset "Test Problems" begin

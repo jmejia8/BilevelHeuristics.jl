@@ -16,7 +16,6 @@ mutable struct Nested <: AbstractNested
     ll::AbstractParameters
 end
 
-const Heuristic = Nested
 
 include("lower_level.jl")
 include("multi_objective.jl")
@@ -122,3 +121,4 @@ function final_stage!(status, parameters::AbstractNested, problem, information, 
 end
 
 is_better(A, B, parameters::AbstractNested) = Metaheuristics.is_better(A, B)
+
