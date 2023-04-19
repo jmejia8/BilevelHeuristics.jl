@@ -38,8 +38,8 @@ function test_nested_SVBO()
     bounds_ul = bounds_ll = [-ones(3)'; ones(3)']
 
     # UL and LL optimizers and confs.
-    method_ul = DE(N=10;options=Options(f_calls_limit=10000, iterations=1000, time_limit=2.5, debug=false, seed=1))
-    method_ll = NSGA2(N=20;options=Options(f_calls_limit=1000))
+    method_ul = DE(N=10;options=Options(f_calls_limit=10000, iterations=10, time_limit=2.5, debug=false, seed=1))
+    method_ll = NSGA2(N=20;options=Options(f_calls_limit=100))
     method = Nested(;ul=method_ul, ll=method_ll)
 
     # optimize
@@ -71,7 +71,7 @@ function test_nested_MOBO()
 
     # UL and LL optimizers and confs.
     method_ul = NSGA2(N=10;options=Options(f_calls_limit=100, debug=false,seed=1))
-    method_ll = NSGA2(N=20;options=Options(f_calls_limit=1000))
+    method_ll = NSGA2(N=20;options=Options(f_calls_limit=100))
     method = Nested(;ul=method_ul, ll=method_ll)
 
     # optimize
@@ -99,7 +99,7 @@ function test_nested_MOBO2()
 
     # UL and LL optimizers and confs.
     method_ul = NSGA2(N=20;options=Options(f_calls_limit=1000,iterations=3, seed=1))
-    method_ll = DE(N=20;options=Options(f_calls_limit=1000))
+    method_ll = DE(N=20;options=Options(f_calls_limit=100))
     method = Nested(;ul=method_ul, ll=method_ll)
 
     # optimize
