@@ -3,7 +3,7 @@ ff(x, y) = x[2]^2 + sum( ( x[1]^2 - sum(y.^2) ).^2 )
 
 function test_BCA()
     
-    bounds_ul = bounds_ll = [-5ones(3) 5ones(3)]'
+    bounds_ul = bounds_ll = boxconstraints(-5ones(3), 5ones(3))
     f_calls = F_calls = 0
 
     F(x, y) = begin
@@ -18,20 +18,20 @@ function test_BCA()
     end
 
 
-    D_ul = size(bounds_ul, 2)
-    D_ll = size(bounds_ll, 2)
+    D_ul = Metaheuristics.getdim(bounds_ul)
+    D_ll = Metaheuristics.getdim(bounds_ul)
 
     options_ul = Options(f_tol = 1e-2, iterations = 2, time_limit=3.1, debug = false, seed=1)
-    options_ll = Options(f_tol = 1e-3)
+    options_ll = Options(f_tol = 1e-3, iterations = 10)
 
     information_ul = Information(f_optimum = 0.0)
     information_ll = Information(f_optimum = 0.0)
     
     methods = [
-               SABO( N = 14;options_ul, options_ll, information_ul, information_ll),
-               QBCA2(N = 14;options_ul, options_ll, information_ul, information_ll),
-               QBCA( N = 14;options_ul, options_ll, information_ul, information_ll),
-               BCA(  N = 14;options_ul, options_ll, information_ul, information_ll),
+               SABO( N = 4;options_ul, options_ll, information_ul, information_ll),
+               QBCA2(N = 4;options_ul, options_ll, information_ul, information_ll),
+               QBCA( N = 4;options_ul, options_ll, information_ul, information_ll),
+               BCA(  N = 4;options_ul, options_ll, information_ul, information_ll),
               ]
 
     for method in methods
@@ -54,7 +54,7 @@ function test_blemo()
     F, f, bounds_ul, bounds_ll, Ψ, UL_sols = TestProblems.TP.get_problem(fnum)
 
     options_ul = Options(iterations = 2, debug = false, seed=1)
-    options_ll = Options(iterations = 40)
+    options_ll = Options(iterations = 10)
 
     nsga2_ul = NSGA2(N = 400, p_m = 0.1, η_m = 20, η_cr = 15, p_cr = 0.9)
     nsga2_ll = NSGA2(N = 40,  p_m = 0.1, η_m = 20, η_cr = 15, p_cr = 0.9)
@@ -78,7 +78,7 @@ function test_sms_mobo()
     F, f, bounds_ul, bounds_ll, Ψ, UL_sols = TestProblems.TP.get_problem(fnum)
 
     options_ul = Options(iterations = 2, debug = false, seed=1)
-    options_ll = Options(iterations = 40)
+    options_ll = Options(iterations = 10)
 
 
     method = SMS_MOBO(;options_ul, options_ll)

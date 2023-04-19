@@ -131,10 +131,10 @@ function initialize!(
         args...;
         kargs...
     )
-    a = view(problem.ul.bounds, 1, :)'
-    b = view(problem.ul.bounds, 2, :)'
+    a = problem.ul.search_space.lb'
+    b = problem.ul.search_space.ub'
     D = length(a)
-    D_ll = size(problem.ll.bounds, 2)
+    D_ll = Metaheuristics.getdim(problem.ll.search_space)
 
 
     #### initialize budget and parameters
@@ -197,8 +197,8 @@ function update_state!(
     end
     
 
-    a = problem.ul.bounds[1,:]
-    b = problem.ul.bounds[2,:]
+    a = problem.ul.search_space.lb
+    b = problem.ul.search_space.ub
     D = length(a)
 
     X = zeros(parameters.N, D)
@@ -231,7 +231,7 @@ function update_state!(
 
         x = leader_pos(population[i])
         p = x .+ ηX .* (cX .- u)
-        Metaheuristics.replace_with_random_in_bounds!(p, problem.ul.bounds)
+        Metaheuristics.replace_with_random_in_bounds!(p, problem.ul.search_space)
         ll_sols = lower_level_optimizer(status, parameters, problem, information, options, p)
 
 

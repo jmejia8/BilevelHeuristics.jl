@@ -53,16 +53,16 @@ function Metaheuristics.update_state!(
         # crossover
         c1, c2 = Metaheuristics.SBX_crossover(Metaheuristics.get_position(pa), 
                                               Metaheuristics.get_position(pb),
-                                              problem.bounds,parameters.η_cr,
+                                              problem.search_space,parameters.η_cr,
                                               parameters.p_cr)
        
         # mutation
-        Metaheuristics.polynomial_mutation!(c1,problem.bounds,parameters.η_m, parameters.p_m)
-        Metaheuristics.polynomial_mutation!(c2,problem.bounds,parameters.η_m, parameters.p_m)
+        Metaheuristics.polynomial_mutation!(c1,problem.search_space,parameters.η_m, parameters.p_m)
+        Metaheuristics.polynomial_mutation!(c2,problem.search_space,parameters.η_m, parameters.p_m)
        
         # rapair solutions if necesary
-        Metaheuristics.reset_to_violated_bounds!(c1, problem.bounds)
-        Metaheuristics.reset_to_violated_bounds!(c2, problem.bounds)
+        Metaheuristics.reset_to_violated_bounds!(c1, problem.search_space)
+        Metaheuristics.reset_to_violated_bounds!(c2, problem.search_space)
 
         # evaluate offspring
         offspring1 = Metaheuristics.create_solution(c1, problem)

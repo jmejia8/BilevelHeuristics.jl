@@ -1,3 +1,56 @@
+function show_status_oneline(status, parameters, options)
+    # sorry for the hard code :-)
+    !options.ul.verbose && (return)
+    d = Any[
+         "Iteration" => status.iteration,
+         "UL Evals" => status.F_calls,
+         "LL Evals" => status.f_calls,
+        ]
+    # show header
+
+    t = status.iteration
+    Fmin, fmin = minimum(status)
+    if fmin isa Number
+        push!(d, "UL Min" => Fmin)
+        push!(d, "LL Min" => fmin)
+    else
+        _p = get_ul_population(status.population)
+        n = length(Metaheuristics.get_non_dominated_solutions(_p))
+        s = sprint(print, "$n/$(length(status.population))")
+        push!(d, "NDS" => s)
+        # 
+    end
+
+    n = count(Metaheuristics.is_feasible.(status.population))
+    push!(d, "Feasibles" => sprint(print, n, " / ", length(status.population)))
+    push!(d, "Time" => @sprintf("%.4f s", status.overall_time))
+
+
+    if status.iteration <= 1 || status.iteration % 1000 == 0
+        nm = [@sprintf(" % 10s ", string(v)) for v in first.(d)]
+        lines = [fill('-', length(n) ) |> join for n in nm]
+        println("+", join(lines, "+"), "+")
+        println("|", join(nm, "|"), "|")
+        println("+", join(lines, "+"), "+")
+    end
+    print("|")
+
+    for v in last.(d)
+        if v isa Integer
+            txt = @sprintf("% 10d", v)
+        elseif v isa AbstractString
+            txt = @sprintf("% 10s", v)
+        elseif v isa AbstractFloat
+            txt = @sprintf("%1.4g", v)
+        else 
+            print(v, " | ")
+            continue
+        end
+        @printf(" % 10s |", txt)
+    end
+    println("")
+end
+
 """
     optimize(F, f, bounds_ul, bounds_ll, method = BCA(); logger = (status) -> nothing)
 
@@ -43,8 +96,8 @@ julia> res = optimize(F, f, bounds_ul, bounds_ll)
 function Metaheuristics.optimize(
         F::Function, # objective function UL
         f::Function, # objective function LL 
-        bounds_ul::AbstractMatrix,
-        bounds_ll::AbstractMatrix,
+        bounds_ul,
+        bounds_ll,
         method::Metaheuristics.AbstractAlgorithm = BCA();
         logger::Function = (status) -> nothing,
     )
@@ -59,8 +112,8 @@ function Metaheuristics.optimize(
     parameters = method.parameters
     ###################################
 
-    problem_ul = Metaheuristics.Problem(F, Array(bounds_ul))
-    problem_ll = Metaheuristics.Problem(f, Array(bounds_ll))
+    problem_ul = Metaheuristics.Problem(F, bounds_ul)
+    problem_ll = Metaheuristics.Problem(f, bounds_ll)
     problem = BLProblem(problem_ul, problem_ll)
     seed!(options.ul.seed)
 
@@ -81,6 +134,8 @@ function Metaheuristics.optimize(
         msg = "Current Status of " * string(typeof(parameters))
         @info msg
         display(status)
+    elseif options.ul.verbose
+        show_status_oneline(status, parameters, options)
     end
 
     status.iteration = 1
@@ -134,6 +189,8 @@ function Metaheuristics.optimize(
             msg = "Current Status of " * string(typeof(parameters))
             @info msg
             display(status)
+        elseif options.ul.verbose
+            show_status_oneline(status, parameters, options)
         end
 
     end
@@ -153,3 +210,5 @@ function Metaheuristics.optimize(
     return status
 
 end
+
+

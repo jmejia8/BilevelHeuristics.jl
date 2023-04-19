@@ -115,8 +115,8 @@ function initialize!(
         kargs...
     )
 
-    D = size(problem.ul.bounds, 2)
-    D_ll = size(problem.ll.bounds, 2)
+    D = Metaheuristics.getdim(problem.ul.search_space)
+    D_ll =  Metaheuristics.getdim(problem.ll.search_space)
 
     parameters.K = max(parameters.K, 2)
     K = parameters.K
@@ -163,7 +163,7 @@ function update_state!(
         kargs...
     )
 
-    D = size(problem.ul.bounds, 2)
+    D = Metaheuristics.getdim(problem.ul.search_space)
     I = randperm(parameters.N)
     K = parameters.K
     population = status.population
@@ -179,7 +179,7 @@ function update_state!(
 
         # new solution
         x = leader_pos(population[i]) .+ η .* (c .- u)
-        Metaheuristics.replace_with_random_in_bounds!(x, problem.ul.bounds)
+        Metaheuristics.replace_with_random_in_bounds!(x, problem.ul.search_space)
         
         # optimize lower leve
         ll_sols = lower_level_optimizer(status, parameters, problem, information, options, x)

@@ -66,13 +66,13 @@ function show_optim_info(
     mask = sortperm(fvals(pf)[:,1])
     fvals_ll = fvals(population_ll)[mask]
 
-    plt = scatterplot(eachindex(fvals_ll),
-                      fvals_ll,
-                      ylabel="F ",
-                      xlabel="Num. of solution",
-                      title="Lower Level",
-                      border=:dotted)
-    show(io, plt)
+    # plt = scatterplot(eachindex(fvals_ll),
+    #                   fvals_ll,
+    #                   ylabel="F ",
+    #                   xlabel="Num. of solution",
+    #                   title="Lower Level",
+    #                   border=:dotted)
+    # show(io, plt)
     println(io, "")
 
 end

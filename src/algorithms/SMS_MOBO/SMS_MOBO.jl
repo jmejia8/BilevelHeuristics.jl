@@ -151,10 +151,10 @@ function initialize!(
         kargs...
     )
 
-    a = view(problem.ul.bounds, 1, :) # lower bounds (UL)
-    b = view(problem.ul.bounds, 2, :) # upper bounds (UL)
+    a = problem.ul.search_space.lb # lower bounds (UL)
+    b = problem.ul.search_space.ub # upper bounds (UL)
     D = length(a)
-    D_ll = size(problem.ll.bounds, 2)
+    D_ll = Metaheuristics.getdim(problem.ll.search_space)
 
     N_ul = parameters.ul.N
     N_ll = parameters.ll.N

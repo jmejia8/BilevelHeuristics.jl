@@ -52,8 +52,8 @@ function use_surrogate!( status,
     
     
 
-    a = problem.bounds[1,:]
-    b = problem.bounds[2,:]
+    a = problem.search_space.lb
+    b = problem.search_space.ub
 
     Y = Metaheuristics.fvals(status.population)
     Y /= maximum(abs.(Y))

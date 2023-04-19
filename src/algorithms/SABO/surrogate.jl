@@ -8,8 +8,8 @@ function surrogate_search!(
         kargs...)
 
     N = length(status.population)
-    a = problem.ul.bounds[1,:]
-    b = problem.ul.bounds[2,:]
+    a = problem.ul.search_space.lb
+    b = problem.ul.search_space.ub
 
     X = zeros(N, length(a))# map(sol -> leader_pos(sol)', status.population)
     for i = 1:N

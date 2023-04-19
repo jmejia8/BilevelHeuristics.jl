@@ -8,8 +8,8 @@ import ..follower_pos, ..leader_pos, ..gen_optimal, ..SECA
 function gen_optimal_sabo(x, parameters, problem, local_population=[], accurate=false)
     f(y) = Metaheuristics.evaluate(x, y, problem.ll) 
 
-    bounds = problem.ll.bounds
-    D = size(bounds, 2)
+    bounds = problem.ll.search_space
+    D = Metaheuristics.getdim(bounds)
     K = parameters.K
 
     if accurate || length(local_population) < D
@@ -32,8 +32,8 @@ function gen_optimal_sabo(x, parameters, problem, local_population=[], accurate=
             push!(population, Metaheuristics.generateChild(y, f(y)))
         end
         # Complete with random
-        a = bounds[1, :]
-        b = bounds[2, :]
+        a = bounds.lb
+        b = bounds.ub
         while length(population) < N
             y = a + (b - a) .* rand(D)
             push!(population, Metaheuristics.generateChild(y, f(y)))
@@ -81,7 +81,7 @@ function lower_level_optimizer(
         kargs...
     )
 
-    D = size(problem.ll.bounds, 2)
+    D = Metaheuristics.getdim(problem.ll.search_space)
     N = length(status.population)
 
     C = []

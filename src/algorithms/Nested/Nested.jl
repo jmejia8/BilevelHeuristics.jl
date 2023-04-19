@@ -50,7 +50,7 @@ function initialize!(
     )
 
     if options.ul.f_calls_limit == 0
-        D = size(problem.ul.bounds,2)
+        D = Metaheuristics.getdim(problem.ul.search_space)
         options.ul.f_calls_limit = 500*D
         if options.ul.iterations == 0
             options.ul.iterations = options.ul.f_calls_limit ÷ D
@@ -58,7 +58,7 @@ function initialize!(
     end
 
     if options.ll.f_calls_limit == 0
-        D = size(problem.ll.bounds,2)
+        D = Metaheuristics.getdim(problem.ll.search_space)
         options.ll.f_calls_limit = 500*D
         if options.ll.iterations == 0
             options.ll.iterations = options.ll.f_calls_limit ÷ D
