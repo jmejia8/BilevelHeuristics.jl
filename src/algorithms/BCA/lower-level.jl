@@ -47,7 +47,7 @@ function handle_ll_multimodality(res, problem, options)
     ll_sols = [res.best_sol]
 
     # for normalization
-    Diag = norm( problem.ll.bounds[1,:] - problem.ll.bounds[2,:] )
+    Diag = norm( problem.ll.search_space.Δ )
 
     # min distance between solution with same fitness
     d_tol = 0.01Diag
