@@ -3,7 +3,7 @@ ff(x, y) = x[2]^2 + sum( ( x[1]^2 - sum(y.^2) ).^2 )
 
 function test_BCA()
     
-    bounds_ul = bounds_ll = [-5ones(3) 5ones(3)]'
+    bounds_ul = bounds_ll = boxconstraints(-5ones(3), 5ones(3))
     f_calls = F_calls = 0
 
     F(x, y) = begin
@@ -18,8 +18,8 @@ function test_BCA()
     end
 
 
-    D_ul = size(bounds_ul, 2)
-    D_ll = size(bounds_ll, 2)
+    D_ul = Metaheuristics.getdim(bounds_ul)
+    D_ll = Metaheuristics.getdim(bounds_ul)
 
     options_ul = Options(f_tol = 1e-2, iterations = 2, time_limit=3.1, debug = false, seed=1)
     options_ll = Options(f_tol = 1e-3, iterations = 10)
