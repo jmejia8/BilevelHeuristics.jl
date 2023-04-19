@@ -42,7 +42,7 @@ function lower_level_optimizer(
         method.status = Metaheuristics.State(population_ll[1], population_ll)
     end
 
-    res = Metaheuristics.optimize(f_x, problem.ll.bounds, method)
+    res = Metaheuristics.optimize(f_x, problem.ll.search_space, method)
 
     return lower_level_decision_making(status, parameters,problem,information,options,res,args...;kargs...)
 end

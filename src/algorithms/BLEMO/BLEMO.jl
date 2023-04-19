@@ -77,10 +77,10 @@ function initialize!(
         kargs...
     )
 
-    a = view(problem.ul.bounds, 1, :) # lower bounds (UL)
-    b = view(problem.ul.bounds, 2, :) # upper bounds (UL)
-    D = length(a)
-    D_ll = size(problem.ll.bounds, 2)
+    a = problem.ul.search_space.lb # lower bounds (UL)
+    b = problem.ul.search_space.ub # upper bounds (UL)
+    D = Metaheuristics.getdim(problem.ul.search_space)
+    D_ll = Metaheuristics.getdim(problem.ll.search_space)
 
     N_ul = parameters.ul.N
     N_ll = parameters.ll.N
@@ -130,7 +130,7 @@ function blemo_genetic_operators(population, parameters, problem; selection=:tou
     # crossover
     c1, c2 = Metaheuristics.SBX_crossover(Metaheuristics.get_position(pa),
                                           Metaheuristics.get_position(pb),
-                                          problem.bounds,
+                                          problem.search_space,
                                           parameters.η_cr,
                                           parameters.p_cr)
 
@@ -138,10 +138,10 @@ function blemo_genetic_operators(population, parameters, problem; selection=:tou
     c = rand([c1, c2])
 
     # mutation
-    Metaheuristics.polynomial_mutation!(c ,problem.bounds,parameters.η_m, parameters.p_m)
+    Metaheuristics.polynomial_mutation!(c ,problem.search_space,parameters.η_m, parameters.p_m)
 
     # repair offprings if necessary
-    Metaheuristics.reset_to_violated_bounds!(c , problem.bounds)
+    Metaheuristics.reset_to_violated_bounds!(c , problem.search_space)
 
     return c
 end

@@ -8,8 +8,8 @@ function gen_initial_state(status, problem::BLProblem,parameters,information,opt
         N = parameters.N
     end 
 
-    a = view(problem.ul.bounds, 1, :)'
-    b = view(problem.ul.bounds, 2, :)'
+    a = problem.ul.search_space.lb'
+    b = problem.ul.search_space.ub'
     D = length(a)
 
     X = a .+ (b - a) .* rand(N, D)

@@ -29,7 +29,7 @@ function lower_level_optimizer(
 
 
     options.ll.seed = rand(UInt)
-    res = Metaheuristics.optimize(f_x, problem.ll.bounds, ll_method)
+    res = Metaheuristics.optimize(f_x, problem.ll.search_space, ll_method)
 
     lower_level_decision_making(status, blparameters,problem,information,options,res,args...;kargs...)
 

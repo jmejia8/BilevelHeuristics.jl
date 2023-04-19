@@ -1,11 +1,11 @@
 function BFGS_LL(x, y0, parameters::QBCA, problem, information, options)
     f(y) = Metaheuristics.evaluate(x, y, problem.ll)
 
-    Metaheuristics.reset_to_violated_bounds!(y0, problem.ll.bounds)
+    Metaheuristics.reset_to_violated_bounds!(y0, problem.ll.search_space)
     # approx
     r = Optim.optimize(f,
-                       problem.ll.bounds[1, :],
-                       problem.ll.bounds[2, :],
+                       problem.ll.search_space.lb,
+                       problem.ll.search_space.ub,
                        y0,
                        Optim.Fminbox(Optim.BFGS()),
                        Optim.Options(outer_iterations = 1,

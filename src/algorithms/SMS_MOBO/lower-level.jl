@@ -18,9 +18,11 @@ function lower_level_optimizer(status,
     if !isempty(population)
         population_ll = [Metaheuristics.create_child(y, f(y)) for y in population]
 
+        a = problem.ll.search_space.lb
+        Δ = problem.ll.search_space.Δ
+        D = Metaheuristics.getdim(problem.ll.search_space)
         while parameters.ll.N > length(population_ll)
-            D = size(problem.ll.bounds, 2)
-            y = problem.ll.bounds[1,:] + (problem.ll.bounds[2,:] - problem.ll.bounds[1,:]) .* rand(D)
+            y = a + Δ .* rand(D)
             c = Metaheuristics.create_child(y, f(y))
             push!(population_ll, c) 
         end
@@ -29,7 +31,7 @@ function lower_level_optimizer(status,
     end
     
 
-    res = Metaheuristics.optimize(f, problem.ll.bounds, method)
+    res = Metaheuristics.optimize(f, problem.ll.search_space, method)
     Metaheuristics.fast_non_dominated_sort!(res.population)
 
     return res.population

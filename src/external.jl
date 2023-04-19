@@ -1,6 +1,6 @@
 using Reexport
 @reexport using Metaheuristics
-using UnicodePlots
+# using UnicodePlots
 import Metaheuristics: initialize!, update_state!, final_stage!, stop_criteria!
 import Metaheuristics: optimize, is_better
 import Random: seed!, randperm

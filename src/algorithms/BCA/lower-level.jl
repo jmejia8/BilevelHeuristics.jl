@@ -12,7 +12,7 @@ function lower_level_optimizer(
 
     ff(y) = Metaheuristics.evaluate(x, y, problem.ll)
 
-    D = size(problem.ll.bounds, 2)
+    D =  Metaheuristics.getdim(problem.ll.search_space)
 
     N = parameters.n
     K = parameters.K
@@ -25,7 +25,7 @@ function lower_level_optimizer(
                                 resize_population = parameters.resize_population,
                                 options = opts_ll)
     # perform optimization
-    res = Metaheuristics.optimize(ff, problem.ll.bounds, method)
+    res = Metaheuristics.optimize(ff, problem.ll.search_space, method)
 
     ############# updated to handle multi-modal problems at lower level #################
     return handle_ll_multimodality(res, problem, options) 

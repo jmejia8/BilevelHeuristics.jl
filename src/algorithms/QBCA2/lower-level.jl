@@ -24,9 +24,9 @@ end
 function gen_optimal(x, problem, parameters, options)
     f(y) = Metaheuristics.evaluate(x, y, problem.ll) 
 
-    bounds = problem.ll.bounds
+    bounds = problem.ll.search_space
 
-    D = size(bounds, 2)
+    D = Metaheuristics.getdim(bounds)
 
     options.ll.seed = rand(UInt) # this is important
 
@@ -50,14 +50,14 @@ end
 function BFGS_LL(x, y0, parameters, problem, information, options)
     f(y) = Metaheuristics.evaluate(x, y, problem.ll)
 
-    Metaheuristics.reset_to_violated_bounds!(y0, problem.ll.bounds)
+    Metaheuristics.reset_to_violated_bounds!(y0, problem.ll.search_space)
 
     options_bfgs = Optim.Options(f_calls_limit=1000, outer_iterations=2, f_tol=1e-8)
     method = Optim.Fminbox(Optim.BFGS(linesearch = LineSearches.BackTracking(order=3)))
     # approx
     r = Optim.optimize(f,
-                       problem.ll.bounds[1, :],
-                       problem.ll.bounds[2, :],
+                       problem.ll.search_space.lb,
+                       problem.ll.search_space.ub,
                        y0,
                        method,
                        options_bfgs
@@ -95,7 +95,7 @@ function lower_level_optimizer(
     )
 
     K = 3
-    D_ll = size(problem.ll.bounds, 2)
+    D_ll = Metaheuristics.getdim(problem.ll.search_space)
 
     y = nothing
     f_calls = 0
@@ -108,7 +108,7 @@ function lower_level_optimizer(
 
 
         c = center_ll(V, parameters)
-        y = Metaheuristics.replace_with_random_in_bounds!(c, problem.ll.bounds)
+        y = Metaheuristics.replace_with_random_in_bounds!(c, problem.ll.search_space)
 
         ########## Improve Stage ##########        
         sol = BFGS_LL(x, y, parameters, problem, information, options)
