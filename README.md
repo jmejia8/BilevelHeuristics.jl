@@ -87,3 +87,7 @@ res = optimize(F, f, bounds_ul, bounds_ll, BCA())
 x, y = minimizer(res) # upper (x) and lower (y) level decision vectors
 Fmin, fmin = minimum(res) # upper and lower objective values.
 ```
+
+## TO DO
+
+- [ ] Parallelize the lower-level optimization procedures.
