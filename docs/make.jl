@@ -13,6 +13,7 @@ makedocs(
                   "Index" => "index.md",
                   "Algorithms" => "algorithms.md",
                   "Examples" => "examples.md",
+                  "Problems" => "problems.md",
                   "API References" => "api.md",
                  ]
         )
