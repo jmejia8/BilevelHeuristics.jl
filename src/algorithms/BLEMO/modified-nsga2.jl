@@ -47,7 +47,7 @@ function Metaheuristics.update_state!(
     Q = typeof(status.population[1])[]
     for i = 1:2:parameters.N
 
-        pa = Metaheuristics.tournament_selection(status.population, rand(I))
+        pa = blemo_tournament_selection(status.population, rand(I))
         pb = rand(elite_set)
 
         # crossover

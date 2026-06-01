@@ -64,6 +64,14 @@ end
 get_ul_population(pop::Vector{BLEMOIndividual}) = [sol.ul for sol in pop]
 get_ll_population(pop::Vector{BLEMOIndividual{Metaheuristics.xFgh_indiv}}) = [sol.ll for sol in pop]
 
+function blemo_tournament_selection(P, a)
+    b = rand(1:length(P))
+    while a == b
+        b = rand(1:length(P))
+    end
+    return P[a].rank < P[b].rank || (P[a].rank == P[b].rank && P[a].crowding > P[b].crowding) ? P[a] : P[b]
+end
+
 include("lower-level.jl")
 
 
@@ -119,8 +127,8 @@ function blemo_genetic_operators(population, parameters, problem; selection=:tou
     end
     
     if selection == :tournament
-        pa = Metaheuristics.tournament_selection(population, i)
-        pb = Metaheuristics.tournament_selection(population, j)
+        pa = blemo_tournament_selection(population, i)
+        pb = blemo_tournament_selection(population, j)
     else
         pa = population[i]
         pb = population[j]
