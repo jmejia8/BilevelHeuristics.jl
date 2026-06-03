@@ -1,80 +1,39 @@
 """
     BCA(;N, n, K, η_max, resize_population)
 
-Bilevel Centers Algorithm uses two nested ECA.
+Bilevel Centers Algorithm — a physics-inspired metaheuristic for single-objective bilevel
+optimisation.  It uses a nested scheme where both the upper and lower levels employ a
+**center-of-mass** variation operator, originally from the ECA (Ecology-based
+Optimization Algorithm).
+
+## How it works
+
+At each iteration, for every individual in the upper-level population:
+1. A random subset `U` of size `K` is selected.
+2. The center of mass `c` of `U` is computed, weighted by the combined fitness
+   `Q = F + f` (i.e., both level objectives).
+3. A new candidate `p = x_i + η · (c - u_worst)` is generated, where `u_worst` is the
+   worst element in `U` and `η` is a random step size.
+4. The lower-level problem is solved for `p` (using the same center-of-mass strategy),
+   producing one or more optimal lower-level responses.
+5. The new pair `(p, y_opt)` replaces a worse member of the population.
+
+The population size may be dynamically reduced during the run (`resize_population`),
+shifting from exploration to exploitation.
 
 ## Parameters
-- `N` Upper level population size
-- `n` Lower level population size.
-- `K` Num. of solutions to generate centers.
-- `η_max` Step size.
+- `N` — upper-level population size (auto‑computed from `K × D_ul` if 0).
+- `n` — lower-level population size (auto‑computed if 0).
+- `K` — number of solutions used to compute the center of mass (default `7`).
+  Larger `K` → faster convergence (exploitation); smaller `K` → more exploration.
+- `η_max` — maximum step size for the variation operator (default `2.0`).
+- `resize_population` — if `true`, the population shrinks linearly over the run
+  (default `true`).
 
-## Usage
-
-Upper level problem: `F(x,y)` with `x` as the upper-level vector.
-
-```julia-repl
-julia> F(x, y) = sum(x.^2) + sum(y.^2)
-F (generic function with 1 method)
-
-julia> bounds_ul = [-ones(5) ones(5)];
-
-```
-
-Lower level problem: `f(x, y)` with `y` as the lower-level vector.
-
-```julia-repl
-julia> f(x, y) = sum((x - y).^2) + y[1]^2
-f (generic function with 1 method)
-
-julia> bounds_ll = [-ones(5) ones(5)];
-
-```
-
-Approximate solution.
-
-```julia-repl
-julia> res = optimize(F, f, bounds_ul, bounds_ll, BCA())
-+=========== RESULT ==========+
-  iteration: 108
-    minimum: 
-          F: 2.7438e-09
-          f: 3.94874e-11
-  minimizer: 
-          x: [-8.80414308649828e-6, 2.1574853199308744e-5, -1.5550602817418899e-6, 1.9314104453973864e-5, 2.1709393089480435e-5]
-          y: [-4.907639660543081e-6, 2.173986368018122e-5, -1.8133242873785074e-6, 1.9658451600356374e-5, 2.1624363965042988e-5]
-    F calls: 2503
-    f calls: 6272518
-    Message: Stopped due UL function evaluations limitations. 
- total time: 14.8592 s
-+============================+
-
-julia> x, y = minimizer(res);
-
-julia> x
-5-element Vector{Float64}:
- -8.80414308649828e-6
-  2.1574853199308744e-5
- -1.5550602817418899e-6
-  1.9314104453973864e-5
-  2.1709393089480435e-5
-
-julia> y
-5-element Vector{Float64}:
- -4.907639660543081e-6
-  2.173986368018122e-5
- -1.8133242873785074e-6
-  1.9658451600356374e-5
-  2.1624363965042988e-5
-
-julia> Fmin, fmin = minimum(res)
-(2.7438003987697017e-9, 3.9487399650845625e-11)
-```
-
-## Citation
+## Reference
 > Mejía-de-Dios, J. A., & Mezura-Montes, E. (2018, November). A physics-inspired algorithm
-> for bilevel optimization. In 2018 IEEE International Autumn Meeting on Power, Electronics
-> and Computing (ROPEC) (pp. 1-6). IEEE.
+> for bilevel optimization. In *2018 IEEE International Autumn Meeting on Power, Electronics
+> and Computing (ROPEC)* (pp. 1–6). IEEE.
 """
 mutable struct BCA <: Metaheuristics.AbstractParameters
     N::Int

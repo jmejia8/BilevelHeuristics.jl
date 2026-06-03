@@ -1,3 +1,8 @@
+"""
+    call_limit_stop_check(status, information, options)
+
+Stop when the number of upper-level function evaluations exceeds `options.ul.f_calls_limit`.
+"""
 function call_limit_stop_check(status, information, options)
     cond = status.F_calls > options.ul.f_calls_limit
     if cond
@@ -7,7 +12,11 @@ function call_limit_stop_check(status, information, options)
     cond
 end
 
+"""
+    iteration_stop_check(status, information, options)
 
+Stop when `status.iteration >= options.ul.iterations`.
+"""
 function iteration_stop_check(status, information, options)
     cond = status.iteration >= options.ul.iterations
 
@@ -18,7 +27,11 @@ function iteration_stop_check(status, information, options)
     cond
 end
 
+"""
+    time_stop_check(status, information, options)
 
+Stop when the wall-clock time exceeds `options.ul.time_limit`.
+"""
 function time_stop_check(status, information, options)
     cond =  status.overall_time >= options.ul.time_limit
     if cond
@@ -28,6 +41,13 @@ function time_stop_check(status, information, options)
     cond
 end
 
+"""
+    accuracy_stop_check(status, information, options)
+
+Stop when the best solution is within tolerance of known optimum values
+(`information.ul.f_optimum`, `information.ll.f_optimum`) using
+`options.ul.f_tol` / `options.ll.f_tol`.  Skips check if optimal values are `NaN`.
+"""
 function accuracy_stop_check(status, information, options)
     F_opt = information.ul.f_optimum
     f_opt = information.ll.f_optimum
@@ -50,7 +70,12 @@ function accuracy_stop_check(status, information, options)
     cond
 end
 
+"""
+    fitness_variance_stop_check(status, information, options)
 
+Stop when the variance of upper-level objective values in the population is below
+`1e-12`, indicating that the population has converged (prematurely or otherwise).
+"""
 function fitness_variance_stop_check(status, information, options)
     Fvals = Metaheuristics.fvals(map(sol -> sol.ul, status.population))
     cond = var(Fvals) < 1e-12
@@ -63,13 +88,16 @@ function fitness_variance_stop_check(status, information, options)
 end
 
 """
-    diff_check(status, information, options; d = options.ul.f_tol, p = 0.5)
-Check the difference between best and worst objective function values in current
-population (where at least %p of solution are feasible). Return `true` when such difference
-is `<= d`, otherwise return `false`.
-> Ref. Zielinski, K., & Laur, R. (n.d.). Stopping Criteria for Differential Evolution in
-> Constrained Single-Objective Optimization. Studies in Computational Intelligence,
-> 111–138. doi:10.1007/978-3-540-68830-3_4 (https://doi.org/10.1007/978-3-540-68830-3_4)
+    ul_diff_check(status, information, options; d = options.ul.f_tol, p = 0.3)
+
+Stop when the difference between the best and worst feasible upper-level objective values
+in the current population is `<= d`, provided at least `p` (default 30%) of the
+population is feasible.
+
+## Reference
+> Zielinski, K., & Laur, R. (2008). Stopping Criteria for Differential Evolution in
+> Constrained Single-Objective Optimization. *Studies in Computational Intelligence*,
+> 111–138. doi:[10.1007/978-3-540-68830-3_4](https://doi.org/10.1007/978-3-540-68830-3_4)
 """
 function ul_diff_check(status, information, options; d = options.ul.f_tol, p = 0.3)
     mask = Metaheuristics.is_feasible.(status.population)

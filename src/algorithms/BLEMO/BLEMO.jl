@@ -1,10 +1,36 @@
-abstract type AbstractBLEMO end # for inheritance purposes
+abstract type AbstractBLEMO end
 
+"""
+    Subpopulation(x, subpopulation)
+
+A grouping of a single upper-level decision `x` with its associated lower-level population.
+Used internally by [`BLEMO`](@ref) to maintain a diverse set of lower-level responses.
+"""
 mutable struct Subpopulation{T}
     x::Vector{Float64}
     subpopulation::Vector{T}
 end
 
+"""
+    BLEMO(; ul = NSGA2(), ll = NSGA2())
+
+**B**ilevel **E**volutionary **M**ulti-**O**bjective Optimization — a nested evolutionary
+algorithm for multi-objective bilevel problems.
+
+BLEMO maintains multiple *subpopulations*, each corresponding to a distinct upper-level
+decision `x`.  For each `x`, the lower-level NSGA-II finds a set of optimal responses.
+New upper-level candidates are generated via SBX crossover and polynomial mutation on the
+current elite set, and the lower level re-optimises from the inherited subpopulations.
+Non-dominated sorting and crowding distance are used for environmental selection at both
+levels.
+
+The Pareto archive of non-dominated bilevel solutions is stored in
+`method.parameters.archive`.
+
+## Parameters (keyword constructor)
+- `ul` — upper-level NSGA2 configuration.
+- `ll` — lower-level NSGA2 configuration.
+"""
 mutable struct BLEMO <: AbstractBLEMO
     ul::NSGA2
     ll::NSGA2

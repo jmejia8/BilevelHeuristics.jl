@@ -1,33 +1,56 @@
 # Algorithms
 
-## BCA
+## Single-objective
+
+### BCA
 
 ``` @docs
 BCA
 ```
 
-## QBCA
+### QBCA
 
 ``` @docs
 QBCA
 ```
 
-## QBCA2
+### QBCA2
 
 ``` @docs
 QBCA2
 ```
 
-## SABO
+### SABO
 
 ``` @docs
 SABO
 ```
 
+## Multi-objective
 
-## SMS_MOBO
+### BLEMO
+
+``` @docs
+BLEMO
+```
+
+### SMS_MOBO
 
 ``` @docs
 SMS_MOBO
+```
+
+## Flexible frameworks
+
+### Nested
+
+``` @docs
+Nested
+```
+
+### DBMA
+
+``` @docs
+DBMA
 ```
 

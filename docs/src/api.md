@@ -1,7 +1,9 @@
 # API References
 
+## Core types
+
 ```@docs
-optimize
+BLProblem
 ```
 
 ```@docs
@@ -13,14 +15,28 @@ BLOptions
 ```
 
 ```@docs
-get_ll_population
+BLAlgorithm
 ```
-
 
 ```@docs
- get_ul_population
+BLState
 ```
 
+## Main interface
+
+```@docs
+optimize
+```
+
+```@docs
+minimum
+```
+
+```@docs
+minimizer
+```
+
+## Solution accessors
 
 ```@docs
 ulvector
@@ -30,56 +46,73 @@ ulvector
 llvector
 ```
 
+```@docs
+leader_pos
+```
+
+```@docs
+follower_pos
+```
 
 ```@docs
 ulfval
 ```
 
-
 ```@docs
 llfval
 ```
 
-
 ```@docs
-ulfvals
+leader_f
 ```
 
-
 ```@docs
-llfvals
+follower_f
 ```
 
+## Population accessors
 
 ```@docs
-ulgvals
+get_ul_population
 ```
-
 
 ```@docs
-llgvals
+get_ll_population
 ```
-
-
-```@docs
-ulhvals
-```
-
-
-```@docs
-llhvals
-```
-
 
 ```@docs
 ulpositions
 ```
 
-
 ```@docs
 llpositions
 ```
 
+```@docs
+ulfvals
+```
+
+```@docs
+llfvals
+```
+
+```@docs
+ulgvals
+```
+
+```@docs
+llgvals
+```
+
+```@docs
+ulhvals
+```
+
+```@docs
+llhvals
+```
+
+## Validation
 
 ```@docs
 is_pseudo_feasible

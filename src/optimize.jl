@@ -54,43 +54,78 @@ end
 """
     optimize(F, f, bounds_ul, bounds_ll, method = BCA(); logger = (status) -> nothing)
 
-Approximate an optimal solution for the bilevel optimization problem `x ∈ argmin F(x, y)` with
-`x ∈ bounds_ul` subject to `y ∈ argmin{f(x,y) : y ∈ bounds_ll}`.
+Solve a bilevel optimization problem using a heuristic or metaheuristic method.
+
+The upper-level problem is `min_x F(x, y)` subject to `x ∈ bounds_ul` and any
+upper-level constraints returned by `F`, while `y` must be an optimal solution of the
+lower-level problem `min_y f(x, y)` subject to `y ∈ bounds_ll` and its own constraints.
 
 ## Parameters
-- `F` upper-level objective function.
-- `f` lower-level objective function.
-- `bounds_ul, bounds_ll` upper and lower level boundaries (2×n matrices), respectively.
-- `logger` is a functions called at the end of each iteration.
+- `F(x, y)` — upper-level objective function. Must return one of:
+    - scalar value (unconstrained),
+    - `(fval, g, h)` tuple where `g` / `h` are vectors of inequality / equality constraints.
+- `f(x, y)` — lower-level objective function (same signature as `F`).
+- `bounds_ul` — upper-level bounds, a `2 × D_ul` matrix where row 1 = lower bounds,
+  row 2 = upper bounds.
+- `bounds_ll` — lower-level bounds, a `2 × D_ll` matrix (same layout).
+- `method` — a bilevel algorithm, e.g. [`BCA`](@ref), [`QBCA`](@ref), [`SABO`](@ref),
+  [`SMS_MOBO`](@ref), etc. (default: `BCA()`).
+- `logger` — a function `status -> ...` called at the end of every iteration (useful for
+  custom logging or visualisation).
 
-## Example
+## Returns
+A [`BLState`](@ref) object containing the best solution found, the final population,
+convergence history, and function evaluation counts. Use [`minimum`](@ref) and
+[`minimizer`](@ref) to extract results.
 
-```jldoctest
-julia> F(x, y) = sum(x.^2) + sum(y.^2)
-F (generic function with 1 method)
+## Example (single-objective, unconstrained)
 
-julia> f(x, y) = sum((x - y).^2) + y[1]^2
-f (generic function with 1 method)
+```julia
+F(x, y) = sum(x.^2) + sum(y.^2)
+f(x, y) = sum((x - y).^2) + y[1]^2
+bounds = [-ones(5)'; ones(5)']
 
-julia> bounds_ul = bounds_ll = [-ones(5)'; ones(5)']
-2×5 Matrix{Float64}:
- -1.0  -1.0  -1.0  -1.0  -1.0
-  1.0   1.0   1.0   1.0   1.0
+res = optimize(F, f, bounds, bounds, BCA())
+x, y = minimizer(res)
+Fmin, fmin = minimum(res)
+```
 
-julia> res = optimize(F, f, bounds_ul, bounds_ll)
-+=========== RESULT ==========+
-  iteration: 108
-    minimum: 
-          F: 7.68483e-08
-          f: 3.96871e-09
-  minimizer: 
-          x: [1.0283390421119262e-5, -0.00017833559080058394, -1.612275010196171e-5, 0.00012064585960330227, 4.38964383738248e-5]
-          y: [1.154609166391327e-5, -0.0001300400306798623, 1.1811981430188257e-6, 8.868498295184257e-5, 5.732849695863675e-5]
-    F calls: 2503
-    f calls: 5044647
-    Message: Stopped due UL function evaluations limitations. 
- total time: 21.4550 s
-+============================+
+## Example (constrained)
+
+```julia
+function F(x, y)
+    fval = sum(x.^2) + sum(y.^2)
+    g = [x[1] + x[2] - 1, x[3] - y[3] - 10]   # inequality constraints
+    h = [0.0]                                     # equality constraints
+    return fval, g, h
+end
+
+function f(x, y)
+    fval = sum((x - y).^2) + y[1]^2
+    g = [x[2] - y[1]^2 - 5]
+    h = [0.0]
+    return fval, g, h
+end
+
+bounds_ul = [-ones(5) ones(5)]
+bounds_ll = [-ones(5) ones(5)]
+res = optimize(F, f, bounds_ul, bounds_ll, BCA())
+```
+
+## Example (multi-objective)
+
+```julia
+function F(x, y)  # two upper-level objectives
+    [y[1] - x[1], y[2]], [-1.0 - sum(y)], [0.0]
+end
+
+function f(x, y)  # two lower-level objectives
+    y, [-x[1]^2 + sum(y .^ 2)], [0.0]
+end
+
+bounds_ul = [0.0 1.0]'
+bounds_ll = [-1 -1; 1 1.0]
+res = optimize(F, f, bounds_ul, bounds_ll, SMS_MOBO())
 ```
 """
 function Metaheuristics.optimize(

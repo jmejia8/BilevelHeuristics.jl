@@ -1,15 +1,34 @@
 abstract type AbstractNested <: AbstractParameters end
 
 """
-    Nested(ul, ll)
+    Nested(; ul, ll)
 
-Nested is a framework that uses nested scheme to solve bilevel problem. You only need
-to provide:
+A flexible **nested framework** for bilevel optimisation that accepts any
+`Metaheuristics.jl` algorithm as the upper- and lower-level solver.
 
-- `ul` an upper-level optimizer
-- `ll` a lower-level optimizer
+Unlike the specialised algorithms ([`BCA`](@ref), [`QBCA`](@ref), etc.) which use
+tightly-coupled strategies, `Nested` decouples the two levels entirely:
+1. The upper-level optimizer proposes candidate `x` values.
+2. For each `x`, the lower-level optimizer runs to completion, finding optimal `y`.
+3. The joint solution `(x, y)` is evaluated and the upper-level population is updated.
 
-with their configuration.
+This makes `Nested` suitable for **prototyping** — you can experiment with different
+combinations of algorithms (e.g. `GA` + `DE`, `PSO` + `BFGS`) without implementing any
+bilevel-specific logic.
+
+## Parameters
+- `ul` — a configured `Metaheuristics.AbstractAlgorithm` for the upper level.
+- `ll` — a configured `Metaheuristics.AbstractAlgorithm` for the lower level.
+
+## Example
+
+```julia
+using BilevelHeuristics, Metaheuristics
+
+ul = GA(N = 50)          # Genetic Algorithm at upper level
+ll = DE(N = 50)          # Differential Evolution at lower level
+res = optimize(F, f, bounds_ul, bounds_ll, Nested(; ul, ll))
+```
 """
 mutable struct Nested <: AbstractNested
     ul::AbstractParameters
