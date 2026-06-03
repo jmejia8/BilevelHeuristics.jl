@@ -1,13 +1,26 @@
+"""
+    BLProblem(ul, ll)
+
+A bilevel problem defined by two [`Metaheuristics.Problem`](@extref)s — one for the
+upper (leader) level and one for the lower (follower) level.
+
+- `ul` — upper-level problem (objective `F`, bounds, search space).
+- `ll` — lower-level problem (objective `f`, bounds, search space).
+"""
 mutable struct BLProblem <: Metaheuristics.AbstractProblem
     ul::Metaheuristics.Problem
     ll::Metaheuristics.Problem
 end
 
 """
-    BLInformation(ul, ll)
+    BLInformation(; ul = Information(), ll = Information())
 
-`BLInformation` stores information `Information` about problems at each level (upper
-and lower level).
+Stores runtime information (best / worst function values, feasible ratios, etc.) for
+both the upper and lower levels.  Used internally for termination checks and logging.
+
+## Fields
+- `ul` — [`Metaheuristics.Information`](@extref) for the upper level.
+- `ll` — [`Metaheuristics.Information`](@extref) for the lower level.
 """
 struct BLInformation
     ul::Metaheuristics.Information
@@ -23,10 +36,23 @@ function Base.show(io::IO, blinfo::BLInformation)
 end
 
 """
-    BLOptions(ul, ll)
+    BLOptions(; ul = Options(), ll = Options())
 
-`BLOptions` stores common settings `Options` for metaheuristics at each level (upper
-and lower level).
+Configuration settings (population size, iteration budget, tolerances, verbosity, etc.)
+for both the upper and lower levels.
+
+## Fields
+- `ul` — [`Metaheuristics.Options`](@extref) for the upper level (e.g.
+  `f_calls_limit`, `iterations`, `f_tol`, `verbose`, `seed`, `store_convergence`).
+- `ll` — [`Metaheuristics.Options`](@extref) for the lower level.
+
+## Example
+```julia
+options = BLOptions(
+    ul = Options(f_calls_limit = 10_000, verbose = true),
+    ll = Options(f_calls_limit = 50_000),
+)
+```
 """
 struct BLOptions
     ul::Metaheuristics.Options

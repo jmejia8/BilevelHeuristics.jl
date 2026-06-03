@@ -1,80 +1,43 @@
 """
     QBCA2(;N, K, η_max, δ1, δ2, ε1, ε2, λ, t_reevaluate)
 
-Quasi-newton BCA uses ECA (upper-level) and BFGS (lower-level).
+Improved Quasi-Newton BCA — an enhanced version of [`QBCA`](@ref) that explicitly
+detects and avoids **pseudo-feasible solutions**.
+
+## How it works
+
+A *pseudo-feasible* solution `(x, y)` is one where:
+- `y` is optimal for the lower level given `x`, and
+- `F(x, y)` is close to the upper-level optimum, but
+- the lower-level optimum is not unique (multiple different `y` give the same `f` value).
+
+Such solutions can mislead the upper-level search because the leader observes a good `F`
+value but the follower's response is not stable.  QBCA2 detects pseudo-feasible pairs
+using thresholds `(δ1, δ2, ε1, ε2)` and avoids replacing solutions with unstable ones.
+
+The upper-level search uses the center-of-mass operator, while the lower level is solved
+with BFGS (optionally preceded by Nelder-Mead).  A surrogate model (SECA) can optionally
+be enabled to further reduce lower-level evaluations.
 
 ## Parameters
-- `N` Upper level population size
-- `K` Num. of solutions to generate centers.
-- `η_max` Step size
-- `δ1`, `δ2`, `ε1` `ε2` Parameters for conditions to avoid pseudo-feasible solutions.
+- `N` — upper-level population size (auto‑computed if 0).
+- `K` — number of solutions to generate centers (default `3`).
+- `η_max` — maximum step size (default `2.0`).
+- `δ1`, `δ2` — position difference thresholds for pseudo-feasibility detection
+  (default `1e-2`).
+- `ε1`, `ε2` — objective difference thresholds for pseudo-feasibility detection
+  (default `1e-2`).
+- `t_reevaluate` — frequency (in iterations) for re-evaluating the lower level of the
+  elite solution (default `10`).
+- `λ` — regularisation for the optional surrogate model (default `1e-12`).
+- `autodiff` — differentiation mode for BFGS (`:finite` or `:forward`).
+- `use_surrogate_model` — if `true`, a kernel-interpolation surrogate (SECA) assists
+  the lower-level search (default `false`).
 
-## Usage
-
-Upper level problem: `F(x,y)` with `x` as the upper-level vector.
-
-```julia-repl
-julia> F(x, y) = sum(x.^2) + sum(y.^2)
-F (generic function with 1 method)
-
-julia> bounds_ul = [-ones(5) ones(5)];
-
-```
-
-Lower level problem: `f(x, y)` with `y` as the lower-level vector.
-
-```julia-repl
-julia> f(x, y) = sum((x - y).^2) + y[1]^2
-f (generic function with 1 method)
-
-julia> bounds_ll = [-ones(5) ones(5)];
-
-```
-
-Approximate solution.
-
-```julia-repl
-julia> res = optimize(F, f, bounds_ul, bounds_ll, QBCA2())
-+=========== RESULT ==========+
-  iteration: 59
-    minimum: 
-          F: 3.95536e-07
-          f: 9.2123e-11
-  minimizer: 
-          x: [-1.3573722472608445e-5, -0.00012074600446520904, -0.00035025471067487137, -0.0002315301345354928, -8.239473503719106e-5]
-          y: [-6.786860530140986e-6, -0.00012074599672993571, -0.00035025467380887673, -0.00023153010993486042, -8.239472729799499e-5]
-    F calls: 1775
-    f calls: 299157
-    Message: Stopped due UL small fitness variance. 
- total time: 5.6968 s
-+============================+
-
-julia> x, y = minimizer(res);
-
-julia> x
-5-element Vector{Float64}:
- -1.3573722472608445e-5
- -0.00012074600446520904
- -0.00035025471067487137
- -0.0002315301345354928
- -8.239473503719106e-5
-
-julia> y
-5-element Vector{Float64}:
- -6.786860530140986e-6
- -0.00012074599672993571
- -0.00035025467380887673
- -0.00023153010993486042
- -8.239472729799499e-5
-
-julia> Fmin, fmin = minimum(res)
-(3.9553637806596925e-7, 9.212297088378278e-11)
-```
-
-## Citation
+## Reference
 > Mejía-de-Dios, J. A., Mezura-Montes, E., & Toledo-Hernández, P. (2022).
 > Pseudo-feasible solutions in evolutionary bilevel optimization: Test problems and
-> performance assessment. Applied Mathematics and Computation, 412, 126577.
+> performance assessment. *Applied Mathematics and Computation*, 412, 126577.
 """
 mutable struct QBCA2 <: Metaheuristics.AbstractParameters
     N::Int

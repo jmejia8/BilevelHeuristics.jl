@@ -1,3 +1,12 @@
+"""
+    BLAlgorithm{T} <: Metaheuristics.AbstractAlgorithm
+
+A bilevel algorithm wrapping algorithm-specific parameters (`T`), the current
+[`BLState`](@ref), [`BLInformation`](@ref), and [`BLOptions`](@ref).
+
+Users typically construct instances via the algorithm constructors ([`BCA`](@ref),
+[`QBCA`](@ref), etc.) rather than directly.
+"""
 mutable struct BLAlgorithm{T} <: Metaheuristics.AbstractAlgorithm
     parameters::T
     status::BLState

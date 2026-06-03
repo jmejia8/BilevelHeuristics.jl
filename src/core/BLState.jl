@@ -1,3 +1,28 @@
+"""
+    BLState{T}
+
+The result of a bilevel optimisation run.  Returned by [`optimize`](@ref).
+
+## Fields
+- `best_sol` — the best [`BLIndividual`](@ref) found (according to the algorithm's
+  comparison criterion).
+- `population` — the final population of [`BLIndividual`](@ref)s.
+- `F_calls`, `f_calls` — number of upper- and lower-level function evaluations.
+- `iteration` — number of completed iterations.
+- `convergence` — history of [`BLState`](@ref) snapshots (if `store_convergence` is
+  enabled in options).
+- `start_time`, `final_time`, `overall_time` — timing information (seconds).
+- `stop` — whether the run stopped.
+- `stop_msg` — termination reason string.
+
+## Extracting results
+Use [`minimum`](@ref) and [`minimizer`](@ref) to get the objective values and decision
+vectors of the best solution:
+```julia
+Fmin, fmin = minimum(res)      # (F, f) at the best solution
+x, y       = minimizer(res)    # (x, y) at the best solution
+```
+"""
 mutable struct BLState{T}
     best_sol::T
     population::Vector{T}
@@ -19,7 +44,18 @@ function BLState(best_sol, population)
 end
 
 
+"""
+    minimum(status::BLState) -> (Fval, fval)
+
+Return the upper- and lower-level objective values of the best solution found.
+"""
 minimum(status::BLState) = (leader_f(status.best_sol), follower_f(status.best_sol))
+
+"""
+    minimizer(status::BLState) -> (x, y)
+
+Return the upper- and lower-level decision vectors of the best solution found.
+"""
 minimizer(status::BLState) = (leader_pos(status.best_sol), follower_pos(status.best_sol))
 
 # MOBO

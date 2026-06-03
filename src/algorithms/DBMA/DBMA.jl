@@ -1,3 +1,38 @@
+"""
+    DBMA(; Nu, Nl, F, CR)
+
+**D**ifferential Evolution **B**ilevel **M**ulti-objective **A**lgorithm — an
+ε-constrained DE framework for bilevel problems where the upper level is **multi-objective**
+and the lower level is **single-objective** (or multi-objective).
+
+DBMA extends the ε-constrained Differential Evolution (`εDE`) to both levels.  The
+ε-level control gradually relaxes constraint violations, allowing the algorithm to explore
+infeasible regions early and converge to feasible Pareto-optimal solutions later.
+
+Internally, DBMA inherits from the [`Nested`](@ref) framework and specialises the
+truncation and decision-making steps to handle multi-objective upper-level populations
+using ε-dominance.
+
+## Parameters
+- `Nu` — upper-level population size (default `50`).
+- `Nl` — lower-level population size (default `50`).
+- `F` — DE mutation scaling factor (default `0.7`).
+- `CR` — DE crossover rate (default `0.5`).
+
+## Example
+
+```julia
+using BilevelHeuristics
+
+F(x, y) = [y[1] - x[1], y[2]], [-1.0 - sum(y)], [0.0]   # two objectives
+f(x, y) = sum((x - y).^2) + y[1]^2, [0.0], [0.0]        # single objective
+
+bounds_ul = [0.0 1.0]'
+bounds_ll = [-ones(5) ones(5)]
+
+res = optimize(F, f, bounds_ul, bounds_ll, DBMA())
+```
+"""
 mutable struct DBMA <: AbstractNested
     ul::εDE
     ll::εDE
