@@ -11,6 +11,7 @@ makedocs(
          authors = "Jesús Mejía",
          pages = [
                   "Index" => "index.md",
+                  "Tutorial" => "tutorial.md",
                   "Algorithms" => "algorithms.md",
                   "Examples" => "examples.md",
                   "Problems" => "problems.md",

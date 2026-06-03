@@ -3,7 +3,7 @@
 ## Core types
 
 ```@docs
-BLProblem
+BilevelHeuristics.BLProblem
 ```
 
 ```@docs
@@ -15,7 +15,7 @@ BLOptions
 ```
 
 ```@docs
-BLAlgorithm
+BilevelHeuristics.BLAlgorithm
 ```
 
 ```@docs
@@ -47,11 +47,7 @@ llvector
 ```
 
 ```@docs
-leader_pos
-```
-
-```@docs
-follower_pos
+BilevelHeuristics.leader_pos
 ```
 
 ```@docs
@@ -63,11 +59,7 @@ llfval
 ```
 
 ```@docs
-leader_f
-```
-
-```@docs
-follower_f
+BilevelHeuristics.leader_f
 ```
 
 ## Population accessors
