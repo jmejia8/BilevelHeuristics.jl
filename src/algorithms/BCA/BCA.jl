@@ -3,8 +3,7 @@
 
 Bilevel Centers Algorithm — a physics-inspired metaheuristic for single-objective bilevel
 optimisation.  It uses a nested scheme where both the upper and lower levels employ a
-**center-of-mass** variation operator, originally from the ECA (Ecology-based
-Optimization Algorithm).
+**center-of-mass** variation operator.
 
 ## How it works
 
