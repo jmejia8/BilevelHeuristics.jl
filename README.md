@@ -42,7 +42,6 @@ Current implemented Bilevel Metaheuristics include:
 The following example illustrates the usage of `BilevelHeuristics.jl`. Here, `BCA` is used,
 but this example works for the other optimizers.
 
-
 Defining objective functions corresponding to the BO problem.
 
 **Upper level (leader problem):**
